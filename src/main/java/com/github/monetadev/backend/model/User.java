@@ -1,6 +1,7 @@
 package com.github.monetadev.backend.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
@@ -23,7 +24,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     @Column(name = "creation_date")
     private Date creationDate;
 
@@ -38,4 +39,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     )
     private Set<Role> roles;
+
+    @OneToMany
+    private Set<FlashcardSet> flashcardSets;
 }
