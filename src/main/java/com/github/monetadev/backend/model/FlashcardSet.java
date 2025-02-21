@@ -1,11 +1,15 @@
 package com.github.monetadev.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@Data
+@EqualsAndHashCode(of = "id")
 @Entity
 public class FlashcardSet {
     @Id

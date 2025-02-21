@@ -1,6 +1,8 @@
 package com.github.monetadev.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -8,6 +10,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
+@Data
+@EqualsAndHashCode(of = "id")
 @Entity
 public class User {
     @Id
