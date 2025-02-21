@@ -24,7 +24,7 @@ public class Flashcard {
     @Column(name = "definition", nullable = false)
     private String definition;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "flashcard_set_id", nullable = false, updatable = false)
     private FlashcardSet flashcardSet;
 }

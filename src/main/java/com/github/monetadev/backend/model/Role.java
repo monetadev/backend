@@ -19,10 +19,10 @@ public class Role {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "roles_privileges",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id"),

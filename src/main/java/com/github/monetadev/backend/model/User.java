@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,13 +30,13 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "creation_date")
-    private Date creationDate;
+    private Instant creationDate;
 
     @UpdateTimestamp
     @Column(name = "last_updated")
-    private Date lastUpdated;
+    private Instant lastUpdated;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
@@ -44,6 +44,14 @@ public class User {
     )
     private Set<Role> roles;
 
-    @OneToMany
+    @OneToMany(
+            mappedBy = "author",
+            fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.REMOVE
+            },
+            orphanRemoval = true)
     private Set<FlashcardSet> flashcardSets;
 }

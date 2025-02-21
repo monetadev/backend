@@ -19,6 +19,6 @@ public class Privilege {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(mappedBy = "privileges")
+    @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
     private Set<Role> roles;
 }
