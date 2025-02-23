@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@Entity
+@Entity(name = "users")
 public class User {
     @Id
     @Column(name = "user_id")
