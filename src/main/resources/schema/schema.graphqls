@@ -109,6 +109,10 @@ type User{
 
     email: String!
 
+    firstName: String!
+
+    lastName: String!
+
     creationDate: DateTimeScalar!
 
     lastUpdated: DateTimeScalar
@@ -154,7 +158,7 @@ type Mutation{
     createRole(id: UUID!, name: String!): Role!
 
     """Update Mutations"""
-    updateUser(id: UUID!, username: String, password: String, email: String): User!
+    updateUser(id: UUID!, username: String, password: String, email: String, firstName: String, lastName: String): User!
 
     updateFlashcard(id: UUID!, flashcardInput: FlashcardInput): Flashcard!
 
