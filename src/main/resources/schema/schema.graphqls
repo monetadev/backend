@@ -1,0 +1,180 @@
+# Used to perform CRUD operations
+type Mutation{
+    # Create
+    createUser(id: UUID!, userInput: RegistrationInput!, createdAt: DateTimeScalar!) : User!
+    createFlashcard(id: UUID!, setID: UUID!, term: String!, definition: String!, position: Int!): Flashcard!
+    createFlashcardSet(id: UUID!, userId: UUID!, visible: Boolean!, createdAt: DateTimeScalar!): FlashcardSet!
+    createPrivilege(id: UUID!, name: String!): Privilege!
+    createRole(id: UUID!, name: String!): Role!
+
+    # Update
+    updateUser(id: UUID!, username: String, password: String, email: String): User!
+    updateFlashcard(id: UUID!, term: String, definition: String, position: Int): Flashcard!
+    updateFlashcardSet(id: UUID!, visible: Boolean): FlashcardSet!
+    updatePrivilege(id: UUID!, name: String): Privilege!
+    updateRole(id: UUID!, name: String): Role!
+
+    # Delete
+    deleteUser(id: UUID!): User!
+    deleteFlashcardSet(id: UUID!): FlashcardSet!
+    deleteFlashcard(id: UUID!): Flashcard!
+    deletePrivilege(id: UUID!): Privilege!
+    deleteRole(id: UUID!): Role!
+}
+
+type Query{
+    # User queries
+    findUserById (id: UUID!) : User
+    findUserByUsername(username: String!): User
+    findUserByEmail(email: String!): User
+
+    # Testing
+    cards : [FlashcardTest]
+    cardsById(id: Int) : FlashcardTest
+
+
+    # FlashcardSet queries
+    findFlashcardSetById (id: UUID!) : FlashcardSet
+    findFlashcardSetByAuthorId(id: UUID!): [FlashcardSet]
+    findPublicFlashcardSets(visible: Boolean!): [FlashcardSet]
+
+    # Flashcard queries
+    findFlashcardById (id: UUID!) : Flashcard
+    findFlashcardsBySetId(id: UUID!): [Flashcard]
+
+    # Role queries
+    findRoleById (id: UUID!) : Role
+    findRoleByName(name: String!): Role
+
+    #Privilege queries
+    findPrivilegeById (id: UUID!): Privilege
+    findPrivilegeByName(name: String!): Privilege
+
+    # Role queries
+    roles: [Role!]!
+}
+
+type FlashcardTest{
+    # unique id
+    id: UUID!
+
+    # id that links to this flashcard's set
+    setId: UUID!
+
+    # flashcard term
+    term : String!
+
+    # flashcard definition
+    definition: String!
+
+    # this flashcard's position within the set
+    position: Int!
+}
+# Represents a flashcard
+type Flashcard{
+    # unique id
+    id: UUID!
+
+    # id that links to this flashcard's set
+    setId: UUID!
+
+    # flashcard term
+    term : String!
+
+    # flashcard definition
+    definition: String!
+
+    # this flashcard's position within the set
+    position: Int!
+}
+
+# Represents a flashcard set
+type FlashcardSet{
+    # unique id
+    id: UUID!
+
+    # id that links to the user who created this set
+    author_user_id: UUID!
+
+    # boolean flag to determine whether flashcard set is private/public
+    visible: Boolean!
+
+    # date of when this set was created
+    creationDate: DateTimeScalar!
+
+    # date of when this set was last updated
+    lastUpdated: DateTimeScalar
+
+    # list of flashcards within the set
+    flashcards: [Flashcard]
+}
+
+# Represents a user
+type User{
+
+    # unique id
+    id: UUID!
+
+    username: String!
+
+    password: String!
+
+    email: String!
+
+    # date the user was created
+    creationDate: DateTimeScalar!
+
+    # last time user updated
+    lastUpdated: DateTimeScalar
+
+    # list of all the user's flashcard sets
+    flashcardSets: [FlashcardSet]
+
+    #current roles
+    roles: [Role]
+}
+
+# represents roles within web app
+type Role{
+    #unique id for every role
+    id: UUID!
+
+    #name of role
+    name: String!
+}
+
+#represents privileges
+type Privilege{
+    id: UUID!
+    name: String!
+}
+
+input RegistrationInput{
+    username: String!
+    email: String!
+    firstName: String!
+    lastName: String!
+    password: String!
+    confirmPassword: String!
+}
+
+#custom scalars
+scalar DateTimeScalar
+
+scalar UUID
+
+## Security Directive
+#directive @auth(requires: RoleLevel = USER) on FIELD_DEFINITION
+#
+## Not sure if this is needed....
+#enum RoleLevel{
+#
+#    # AUTHENTICATED
+#    USER
+#
+#    # PRIVILEGED
+#    ADMIN
+#
+#    # NOT AUTHENTICATED
+#    PUBLIC
+#}
