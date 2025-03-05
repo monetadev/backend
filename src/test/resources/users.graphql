@@ -1,0 +1,17 @@
+#query users{
+#    findUserByUsername(username: "test"){
+#        id
+#        username
+#        password
+#        email
+#        creationDate
+#        lastUpdated
+#    }
+#}
+#
+#query roles{
+#    findRoleByName(name: "USER"){
+#        id
+#        name
+#    }
+#}

@@ -1,155 +1,9 @@
-# Used to perform CRUD operations
-type Mutation{
-    # Create
-    createUser(id: UUID!, userInput: RegistrationInput!, createdAt: DateTimeScalar!) : User!
-    createFlashcard(id: UUID!, setID: UUID!, term: String!, definition: String!, position: Int!): Flashcard!
-    createFlashcardSet(id: UUID!, userId: UUID!, visible: Boolean!, createdAt: DateTimeScalar!): FlashcardSet!
-    createPrivilege(id: UUID!, name: String!): Privilege!
-    createRole(id: UUID!, name: String!): Role!
+"""Custom scalars"""
+scalar DateTimeScalar
+scalar UUID
 
-    # Update
-    updateUser(id: UUID!, username: String, password: String, email: String): User!
-    updateFlashcard(id: UUID!, term: String, definition: String, position: Int): Flashcard!
-    updateFlashcardSet(id: UUID!, visible: Boolean): FlashcardSet!
-    updatePrivilege(id: UUID!, name: String): Privilege!
-    updateRole(id: UUID!, name: String): Role!
-
-    # Delete
-    deleteUser(id: UUID!): User!
-    deleteFlashcardSet(id: UUID!): FlashcardSet!
-    deleteFlashcard(id: UUID!): Flashcard!
-    deletePrivilege(id: UUID!): Privilege!
-    deleteRole(id: UUID!): Role!
-}
-
-type Query{
-    # User queries
-    findUserById (id: UUID!) : User
-    findUserByUsername(username: String!): User
-    findUserByEmail(email: String!): User
-
-    # Testing
-    cards : [FlashcardTest]
-    cardsById(id: Int) : FlashcardTest
-
-
-    # FlashcardSet queries
-    findFlashcardSetById (id: UUID!) : FlashcardSet
-    findFlashcardSetByAuthorId(id: UUID!): [FlashcardSet]
-    findPublicFlashcardSets(visible: Boolean!): [FlashcardSet]
-
-    # Flashcard queries
-    findFlashcardById (id: UUID!) : Flashcard
-    findFlashcardsBySetId(id: UUID!): [Flashcard]
-
-    # Role queries
-    findRoleById (id: UUID!) : Role
-    findRoleByName(name: String!): Role
-
-    #Privilege queries
-    findPrivilegeById (id: UUID!): Privilege
-    findPrivilegeByName(name: String!): Privilege
-
-    # Role queries
-    roles: [Role!]!
-}
-
-type FlashcardTest{
-    # unique id
-    id: UUID!
-
-    # id that links to this flashcard's set
-    setId: UUID!
-
-    # flashcard term
-    term : String!
-
-    # flashcard definition
-    definition: String!
-
-    # this flashcard's position within the set
-    position: Int!
-}
-# Represents a flashcard
-type Flashcard{
-    # unique id
-    id: UUID!
-
-    # id that links to this flashcard's set
-    setId: UUID!
-
-    # flashcard term
-    term : String!
-
-    # flashcard definition
-    definition: String!
-
-    # this flashcard's position within the set
-    position: Int!
-}
-
-# Represents a flashcard set
-type FlashcardSet{
-    # unique id
-    id: UUID!
-
-    # id that links to the user who created this set
-    author_user_id: UUID!
-
-    # boolean flag to determine whether flashcard set is private/public
-    visible: Boolean!
-
-    # date of when this set was created
-    creationDate: DateTimeScalar!
-
-    # date of when this set was last updated
-    lastUpdated: DateTimeScalar
-
-    # list of flashcards within the set
-    flashcards: [Flashcard]
-}
-
-# Represents a user
-type User{
-
-    # unique id
-    id: UUID!
-
-    username: String!
-
-    password: String!
-
-    email: String!
-
-    # date the user was created
-    creationDate: DateTimeScalar!
-
-    # last time user updated
-    lastUpdated: DateTimeScalar
-
-    # list of all the user's flashcard sets
-    flashcardSets: [FlashcardSet]
-
-    #current roles
-    roles: [Role]
-}
-
-# represents roles within web app
-type Role{
-    #unique id for every role
-    id: UUID!
-
-    #name of role
-    name: String!
-}
-
-#represents privileges
-type Privilege{
-    id: UUID!
-    name: String!
-}
-
-input RegistrationInput{
+"""User registration input"""
+input UserRegInput{
     username: String!
     email: String!
     firstName: String!
@@ -158,23 +12,214 @@ input RegistrationInput{
     confirmPassword: String!
 }
 
-#custom scalars
-scalar DateTimeScalar
+"""Flashcard creation or update input"""
+input FlashcardInput{
+    term: String!
+    definition: String!
+    position: Int!
+}
 
-scalar UUID
+"""Flashcard set creation or update"""
+input FlashcardSetInput{
+    title: String
+    description: String
+    visible: Boolean!
+    #tags: [String!]
+}
 
-## Security Directive
-#directive @auth(requires: RoleLevel = USER) on FIELD_DEFINITION
-#
-## Not sure if this is needed....
-#enum RoleLevel{
-#
-#    # AUTHENTICATED
-#    USER
-#
-#    # PRIVILEGED
-#    ADMIN
-#
-#    # NOT AUTHENTICATED
-#    PUBLIC
-#}
+"""Flashcard Filtering Input"""
+input FlashcardFilterInput{
+
+    """Search term"""
+    searchTerm: String
+
+    """Filter by creation date"""
+    createdAfter: DateTimeScalar
+    createdBefore: DateTimeScalar
+}
+
+"""Flashcard Filtering Input"""
+input FlashcardSetFilterInput{
+
+    """Search term"""
+    searchTerm: String
+
+#    """Filter by tag"""
+#    tags: [String]
+
+    """Filter by visibility"""
+    onlyVisible: Boolean
+
+    """Filter by creation date"""
+    createdAfter: DateTimeScalar
+    createdBefore: DateTimeScalar
+}
+
+type Flashcard{
+
+    """Unique identifier"""
+    id: UUID!
+
+    """Unique identifier that links THIS flashcard to a FlashcardSet"""
+    setID: UUID!
+
+    term: String!
+
+    definition: String!
+
+    """THIS Flashcard's position within the set"""
+    position: Int!
+
+    createdAt: DateTimeScalar!
+
+    updatedAt: DateTimeScalar
+}
+
+type FlashcardSet{
+
+    """Unique identifier"""
+    id: UUID!
+
+    """Unique identifier that links THIS FlashcardSet to the original User"""
+    authorUserId: UUID!
+
+    title: String
+
+    description: String
+
+    """Determine whether THIS FlashcardSet is visible to the public or just to the original User"""
+    visible: Boolean!
+
+    creationDate: DateTimeScalar!
+
+    lastUpdated: DateTimeScalar
+
+    """List of Flashcards within the set"""
+    flashcards: [Flashcard]
+}
+
+type User{
+
+    """Unique identifier"""
+    id: UUID!
+
+    username: String!
+
+    password: String!
+
+    email: String!
+
+    creationDate: DateTimeScalar!
+
+    lastUpdated: DateTimeScalar
+
+    flashcardSets: [FlashcardSet]
+
+    """THIS User's assigned roles"""
+    roles: [Role]
+}
+
+type Role{
+
+    """Uniquely identify every role"""
+    id: UUID!
+
+    name: String!
+
+    privileges: [Privilege]
+}
+
+type Privilege{
+
+    """Uniquely identify every privilege"""
+    id: UUID!
+
+    name: String!
+}
+
+"""Used to Perform Crud Operations"""
+type Mutation{
+
+    """Creation Mutations"""
+    createUser(id: UUID!, userInput: UserRegInput!, createdAt: DateTimeScalar!): User!
+
+    #Note: may NOT NEED 'createdAt' here, if we choose to solely deal with timestamp-related fields on the server side
+    createFlashcard(id: UUID!, setId: UUID!, flashcardInput: FlashcardInput!, createdAt: DateTimeScalar!): Flashcard!
+
+    #Same as above comment^^^^
+    createFlashcardSet(id: UUID!, userId: UUID!, flashcardSetInput: FlashcardSetInput!, createdAt: DateTimeScalar!): FlashcardSet!
+
+    createPrivilege(id: UUID!, name: String!): Privilege!
+
+    createRole(id: UUID!, name: String!): Role!
+
+    """Update Mutations"""
+    updateUser(id: UUID!, username: String, password: String, email: String): User!
+
+    updateFlashcard(id: UUID!, flashcardInput: FlashcardInput): Flashcard!
+
+    updateFlashcardSet(id: UUID!, setInput: FlashcardInput): FlashcardSet!
+
+    updatePrivilege(id: UUID!, name: String): Privilege!
+
+    updateRole(id: UUID, name: String): Role!
+
+    """Delete Mutations"""
+    deleteUser(id: UUID!): User!
+
+    deleteFlashcardSet(id: UUID!): FlashcardSet!
+
+    deleteFlashcard(id: UUID!): Flashcard!
+
+    deletePrivilege(id: UUID!): Privilege!
+
+    deleteRole(id: UUID!): Role!
+
+    """Assign a Role to a User"""
+    assignRoleToUser(userId: UUID!, roleId: UUID!): User!
+
+    """Remove a Role to a User"""
+    removeRoleFromUser(userId: UUID!, roleId: UUID!): User!
+
+    """Assign Privilege to Role"""
+    assignPrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
+
+    """Remove Privilege to Role"""
+    removePrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
+}
+
+"""Queries used for retrieving data"""
+type Query{
+
+    findUserById(id: UUID): User
+
+    findUserByUsername(username: String!): User
+
+    findUserByEmail(email: String!): User
+
+    findFlashcardSetById(id: UUID!): FlashcardSet
+
+    findFlashcardSetByAuthorId(id: UUID!): [FlashcardSet]
+
+    findPublicFlashcardSets(visible: Boolean!, filter: FlashcardSetFilterInput): [FlashcardSet]
+
+    findFlashcardById(id: UUID!): Flashcard
+
+    findFlashcardsBySetId(id: UUID!, filter: FlashcardFilterInput): [Flashcard]
+
+    findRoleById(id: UUID!): Role
+
+    findRoleByName(name: String!): Role
+
+    findPrivilegeById(id: UUID!): Privilege
+
+    findPrivilegeByName(name: String!): Privilege
+
+    """Get all roles"""
+    roles: [Role!]!
+
+    """Get all Privileges"""
+    privileges: [Privilege!]!
+
+
+}
