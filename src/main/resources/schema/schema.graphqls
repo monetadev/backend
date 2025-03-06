@@ -7,7 +7,7 @@ scalar UUID
 """
 User registration input
 """
-input UserRegInput{
+input UserRegInput {
     username: String!
     email: String!
     firstName: String!
@@ -17,9 +17,17 @@ input UserRegInput{
 }
 
 """
+Authentication response
+"""
+type AuthPayload {
+    token: String!
+    user: User!
+}
+
+"""
 Flashcard creation or update input
 """
-input FlashcardInput{
+input FlashcardInput {
     term: String!
     definition: String!
     position: Int!
@@ -28,7 +36,7 @@ input FlashcardInput{
 """
 Flashcard set creation or update
 """
-input FlashcardSetInput{
+input FlashcardSetInput {
     title: String
     description: String
     visible: Boolean!
@@ -38,8 +46,7 @@ input FlashcardSetInput{
 """
 Flashcard Filtering Input
 """
-input FlashcardFilterInput{
-
+input FlashcardFilterInput {
     """
     Search term
     """
@@ -53,17 +60,13 @@ input FlashcardFilterInput{
 }
 
 """
-Flashcard Filtering Input
+Flashcard Set Filtering Input
 """
-input FlashcardSetFilterInput{
-
+input FlashcardSetFilterInput {
     """
     Search term
     """
     searchTerm: String
-
-#    """Filter by tag"""
-#    tags: [String]
 
     """
     Filter by visibility
@@ -77,8 +80,28 @@ input FlashcardSetFilterInput{
     createdBefore: DateTime
 }
 
-type Flashcard{
+"""
+AI Document Input
+"""
+input DocumentInput {
+    documentText: String
+    documentBase64: String
+    documentUrl: String
+}
 
+"""
+AI Generation Options
+"""
+input AIGenerationOptions {
+    aiProvider: String!  # "OPENAI", "ANTHROPIC", "OLLAMA"
+    modelName: String!
+    cardCount: Int!
+    difficulty: String!  # "BEGINNER", "INTERMEDIATE", "ADVANCED"
+    language: String!
+    topic: String
+}
+
+type Flashcard {
     """
     Unique identifier
     """
@@ -103,8 +126,18 @@ type Flashcard{
     updatedAt: DateTime
 }
 
-type FlashcardSet{
+type GeneratedFlashcard {
+    term: String!
+    definition: String!
+    position: Int!
+}
 
+type FlashcardGenerationResult {
+    temporaryId: UUID!
+    generatedFlashcards: [GeneratedFlashcard!]!
+}
+
+type FlashcardSet {
     """
     Unique identifier
     """
@@ -124,9 +157,9 @@ type FlashcardSet{
     """
     visible: Boolean!
 
-    creationDate: DateTime!
+    createdAt: DateTime!
 
-    lastUpdated: DateTime
+    updatedAt: DateTime
 
     """
     List of Flashcards within the set
@@ -134,8 +167,7 @@ type FlashcardSet{
     flashcards: [Flashcard]
 }
 
-type User{
-
+type User {
     """
     Unique identifier
     """
@@ -143,17 +175,15 @@ type User{
 
     username: String!
 
-    password: String!
-
     email: String!
 
     firstName: String!
 
     lastName: String!
 
-    creationDate: DateTime!
+    createdAt: DateTime!
 
-    lastUpdated: DateTime
+    updatedAt: DateTime
 
     flashcardSets: [FlashcardSet]
 
@@ -163,8 +193,7 @@ type User{
     roles: [Role]
 }
 
-type Role{
-
+type Role {
     """
     Uniquely identify every role
     """
@@ -175,8 +204,7 @@ type Role{
     privileges: [Privilege]
 }
 
-type Privilege{
-
+type Privilege {
     """
     Uniquely identify every privilege
     """
@@ -188,48 +216,51 @@ type Privilege{
 """
 Used to Perform Crud Operations
 """
-type Mutation{
+type Mutation {
+    """
+    Authentication Mutations
+    """
+    register(input: UserRegInput!): AuthPayload!
+    login(username: String!, password: String!): AuthPayload!
+
+    """
+    AI Generation Mutations
+    """
+    generateFlashcards(document: DocumentInput!, options: AIGenerationOptions!): FlashcardGenerationResult!
+    saveGeneratedFlashcards(
+        temporaryId: UUID!,
+        title: String!,
+        description: String,
+        visible: Boolean!,
+        flashcards: [FlashcardInput!]!
+    ): FlashcardSet!
 
     """
     Creation Mutations
     """
-    createUser(id: UUID!, userInput: UserRegInput!, createdAt: DateTime!): User!
-
-    #Note: may NOT NEED 'createdAt' here, if we choose to solely deal with timestamp-related fields on the server side
-    createFlashcard(id: UUID!, setId: UUID!, flashcardInput: FlashcardInput!, createdAt: DateTime!): Flashcard!
-
-    #Same as above comment^^^^
-    createFlashcardSet(id: UUID!, userId: UUID!, flashcardSetInput: FlashcardSetInput!, createdAt: DateTime!): FlashcardSet!
-
-    createPrivilege(id: UUID!, name: String!): Privilege!
-
-    createRole(id: UUID!, name: String!): Role!
+    createUser(userInput: UserRegInput!): User!
+    createFlashcard(setId: UUID!, flashcardInput: FlashcardInput!): Flashcard!
+    createFlashcardSet(flashcardSetInput: FlashcardSetInput!): FlashcardSet!
+    createPrivilege(name: String!): Privilege!
+    createRole(name: String!): Role!
 
     """
     Update Mutations
     """
-    updateUser(id: UUID!, username: String, password: String, email: String, firstName: String, lastName: String): User!
-
+    updateUser(id: UUID!, username: String, email: String, firstName: String, lastName: String): User!
     updateFlashcard(id: UUID!, flashcardInput: FlashcardInput): Flashcard!
-
-    updateFlashcardSet(id: UUID!, setInput: FlashcardInput): FlashcardSet!
-
+    updateFlashcardSet(id: UUID!, setInput: FlashcardSetInput): FlashcardSet!
     updatePrivilege(id: UUID!, name: String): Privilege!
-
     updateRole(id: UUID, name: String): Role!
 
     """
     Delete Mutations
     """
-    deleteUser(id: UUID!): User!
-
-    deleteFlashcardSet(id: UUID!): FlashcardSet!
-
-    deleteFlashcard(id: UUID!): Flashcard!
-
-    deletePrivilege(id: UUID!): Privilege!
-
-    deleteRole(id: UUID!): Role!
+    deleteUser(id: UUID!): Boolean!
+    deleteFlashcardSet(id: UUID!): Boolean!
+    deleteFlashcard(id: UUID!): Boolean!
+    deletePrivilege(id: UUID!): Boolean!
+    deleteRole(id: UUID!): Boolean!
 
     """
     Assign a Role to a User
@@ -237,7 +268,7 @@ type Mutation{
     assignRoleToUser(userId: UUID!, roleId: UUID!): User!
 
     """
-    Remove a Role to a User
+    Remove a Role from a User
     """
     removeRoleFromUser(userId: UUID!, roleId: UUID!): User!
 
@@ -247,49 +278,43 @@ type Mutation{
     assignPrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
 
     """
-    Remove Privilege to Role
+    Remove Privilege from Role
     """
-    removePrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
+    removePrivilegeFromRole(roleId: UUID!, privilegeId: UUID!): Role!
 }
 
 """
 Queries used for retrieving data
 """
-type Query{
-
+type Query {
+    """
+    User queries
+    """
+    me: User
     findUserById(id: UUID): User
-
     findUserByUsername(username: String!): User
-
     findUserByEmail(email: String!): User
 
+    """
+    FlashcardSet queries
+    """
     findFlashcardSetById(id: UUID!): FlashcardSet
-
     findFlashcardSetByAuthorId(id: UUID!): [FlashcardSet]
+    findPublicFlashcardSets(filter: FlashcardSetFilterInput): [FlashcardSet]
 
-    findPublicFlashcardSets(visible: Boolean!, filter: FlashcardSetFilterInput): [FlashcardSet]
-
+    """
+    Flashcard queries
+    """
     findFlashcardById(id: UUID!): Flashcard
-
     findFlashcardsBySetId(id: UUID!, filter: FlashcardFilterInput): [Flashcard]
 
+    """
+    Role and privilege queries
+    """
     findRoleById(id: UUID!): Role
-
     findRoleByName(name: String!): Role
-
     findPrivilegeById(id: UUID!): Privilege
-
     findPrivilegeByName(name: String!): Privilege
-
-    """
-    Get all roles
-    """
     roles: [Role!]!
-
-    """
-    Get all Privileges
-    """
     privileges: [Privilege!]!
-
-
 }
