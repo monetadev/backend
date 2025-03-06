@@ -46,6 +46,7 @@ dependencies {
     //implementation("org.springframework.ai:spring-ai-transformers-spring-boot-starter")
     implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
+  //  implementation("com.netflix.graphql.dgs.codegen:graphql-dgs-codegen-gradle:7.0.3")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     //developmentOnly("org.springframework.boot:spring-boot-docker-compose")
@@ -68,6 +69,7 @@ dependencies {
     //testImplementation("org.testcontainers:qdrant")
     //testImplementation("org.testcontainers:r2dbc")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    //implementation("com.tailrocks.graphql:graphql-datetime-spring-boot-starter:6.0.0")
 }
 
 dependencyManagement {
