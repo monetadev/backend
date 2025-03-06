@@ -1,8 +1,12 @@
-"""Custom scalars"""
-scalar DateTimeScalar
+"""
+Custom scalars
+"""
+scalar DateTime
 scalar UUID
 
-"""User registration input"""
+"""
+User registration input
+"""
 input UserRegInput{
     username: String!
     email: String!
@@ -12,14 +16,18 @@ input UserRegInput{
     confirmPassword: String!
 }
 
-"""Flashcard creation or update input"""
+"""
+Flashcard creation or update input
+"""
 input FlashcardInput{
     term: String!
     definition: String!
     position: Int!
 }
 
-"""Flashcard set creation or update"""
+"""
+Flashcard set creation or update
+"""
 input FlashcardSetInput{
     title: String
     description: String
@@ -27,80 +35,110 @@ input FlashcardSetInput{
     #tags: [String!]
 }
 
-"""Flashcard Filtering Input"""
+"""
+Flashcard Filtering Input
+"""
 input FlashcardFilterInput{
 
-    """Search term"""
+    """
+    Search term
+    """
     searchTerm: String
 
-    """Filter by creation date"""
-    createdAfter: DateTimeScalar
-    createdBefore: DateTimeScalar
+    """
+    Filter by creation date
+    """
+    createdAfter: DateTime
+    createdBefore: DateTime
 }
 
-"""Flashcard Filtering Input"""
+"""
+Flashcard Filtering Input
+"""
 input FlashcardSetFilterInput{
 
-    """Search term"""
+    """
+    Search term
+    """
     searchTerm: String
 
 #    """Filter by tag"""
 #    tags: [String]
 
-    """Filter by visibility"""
+    """
+    Filter by visibility
+    """
     onlyVisible: Boolean
 
-    """Filter by creation date"""
-    createdAfter: DateTimeScalar
-    createdBefore: DateTimeScalar
+    """
+    Filter by creation date
+    """
+    createdAfter: DateTime
+    createdBefore: DateTime
 }
 
 type Flashcard{
 
-    """Unique identifier"""
+    """
+    Unique identifier
+    """
     id: UUID!
 
-    """Unique identifier that links THIS flashcard to a FlashcardSet"""
+    """
+    Unique identifier that links THIS flashcard to a FlashcardSet
+    """
     setID: UUID!
 
     term: String!
 
     definition: String!
 
-    """THIS Flashcard's position within the set"""
+    """
+    THIS Flashcard's position within the set
+    """
     position: Int!
 
-    createdAt: DateTimeScalar!
+    createdAt: DateTime!
 
-    updatedAt: DateTimeScalar
+    updatedAt: DateTime
 }
 
 type FlashcardSet{
 
-    """Unique identifier"""
+    """
+    Unique identifier
+    """
     id: UUID!
 
-    """Unique identifier that links THIS FlashcardSet to the original User"""
+    """
+    Unique identifier that links THIS FlashcardSet to the original User
+    """
     authorUserId: UUID!
 
     title: String
 
     description: String
 
-    """Determine whether THIS FlashcardSet is visible to the public or just to the original User"""
+    """
+    Determine whether THIS FlashcardSet is visible to the public or just to the original User
+    """
     visible: Boolean!
 
-    creationDate: DateTimeScalar!
+    creationDate: DateTime!
 
-    lastUpdated: DateTimeScalar
+    lastUpdated: DateTime
 
-    """List of Flashcards within the set"""
+    """
+    List of Flashcards within the set
+    """
     flashcards: [Flashcard]
 }
 
 type User{
 
-    """Unique identifier"""
+    """
+    Unique identifier
+    """
     id: UUID!
 
     username: String!
@@ -113,19 +151,23 @@ type User{
 
     lastName: String!
 
-    creationDate: DateTimeScalar!
+    creationDate: DateTime!
 
-    lastUpdated: DateTimeScalar
+    lastUpdated: DateTime
 
     flashcardSets: [FlashcardSet]
 
-    """THIS User's assigned roles"""
+    """
+    THIS User's assigned roles
+    """
     roles: [Role]
 }
 
 type Role{
 
-    """Uniquely identify every role"""
+    """
+    Uniquely identify every role
+    """
     id: UUID!
 
     name: String!
@@ -135,29 +177,37 @@ type Role{
 
 type Privilege{
 
-    """Uniquely identify every privilege"""
+    """
+    Uniquely identify every privilege
+    """
     id: UUID!
 
     name: String!
 }
 
-"""Used to Perform Crud Operations"""
+"""
+Used to Perform Crud Operations
+"""
 type Mutation{
 
-    """Creation Mutations"""
-    createUser(id: UUID!, userInput: UserRegInput!, createdAt: DateTimeScalar!): User!
+    """
+    Creation Mutations
+    """
+    createUser(id: UUID!, userInput: UserRegInput!, createdAt: DateTime!): User!
 
     #Note: may NOT NEED 'createdAt' here, if we choose to solely deal with timestamp-related fields on the server side
-    createFlashcard(id: UUID!, setId: UUID!, flashcardInput: FlashcardInput!, createdAt: DateTimeScalar!): Flashcard!
+    createFlashcard(id: UUID!, setId: UUID!, flashcardInput: FlashcardInput!, createdAt: DateTime!): Flashcard!
 
     #Same as above comment^^^^
-    createFlashcardSet(id: UUID!, userId: UUID!, flashcardSetInput: FlashcardSetInput!, createdAt: DateTimeScalar!): FlashcardSet!
+    createFlashcardSet(id: UUID!, userId: UUID!, flashcardSetInput: FlashcardSetInput!, createdAt: DateTime!): FlashcardSet!
 
     createPrivilege(id: UUID!, name: String!): Privilege!
 
     createRole(id: UUID!, name: String!): Role!
 
-    """Update Mutations"""
+    """
+    Update Mutations
+    """
     updateUser(id: UUID!, username: String, password: String, email: String, firstName: String, lastName: String): User!
 
     updateFlashcard(id: UUID!, flashcardInput: FlashcardInput): Flashcard!
@@ -168,7 +218,9 @@ type Mutation{
 
     updateRole(id: UUID, name: String): Role!
 
-    """Delete Mutations"""
+    """
+    Delete Mutations
+    """
     deleteUser(id: UUID!): User!
 
     deleteFlashcardSet(id: UUID!): FlashcardSet!
@@ -179,20 +231,30 @@ type Mutation{
 
     deleteRole(id: UUID!): Role!
 
-    """Assign a Role to a User"""
+    """
+    Assign a Role to a User
+    """
     assignRoleToUser(userId: UUID!, roleId: UUID!): User!
 
-    """Remove a Role to a User"""
+    """
+    Remove a Role to a User
+    """
     removeRoleFromUser(userId: UUID!, roleId: UUID!): User!
 
-    """Assign Privilege to Role"""
+    """
+    Assign Privilege to Role
+    """
     assignPrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
 
-    """Remove Privilege to Role"""
+    """
+    Remove Privilege to Role
+    """
     removePrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
 }
 
-"""Queries used for retrieving data"""
+"""
+Queries used for retrieving data
+"""
 type Query{
 
     findUserById(id: UUID): User
@@ -219,10 +281,14 @@ type Query{
 
     findPrivilegeByName(name: String!): Privilege
 
-    """Get all roles"""
+    """
+    Get all roles
+    """
     roles: [Role!]!
 
-    """Get all Privileges"""
+    """
+    Get all Privileges
+    """
     privileges: [Privilege!]!
 
 
