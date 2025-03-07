@@ -3,10 +3,8 @@ package com.github.monetadev.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,13 +26,17 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @CreationTimestamp
-    @Column(name = "creation_date")
-    private Instant creationDate;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
-    @UpdateTimestamp
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
+
     @Column(name = "last_updated")
-    private Instant lastUpdated;
+    private LocalDateTime lastUpdated;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -54,4 +56,14 @@ public class User {
             },
             orphanRemoval = true)
     private Set<FlashcardSet> flashcardSets;
+
+    @PrePersist
+    protected void onCreate() {
+        creationDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        lastUpdated = LocalDateTime.now();
+    }
 }
