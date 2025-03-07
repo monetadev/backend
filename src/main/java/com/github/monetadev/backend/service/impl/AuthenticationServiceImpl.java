@@ -6,7 +6,7 @@ import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.RoleRepository;
 import com.github.monetadev.backend.repository.UserRepository;
-import com.github.monetadev.backend.service.RegistrationService;
+import com.github.monetadev.backend.service.AuthenticationService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,13 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class RegistrationServiceImpl implements RegistrationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final Long initialStartupUserCount;
 
-    public RegistrationServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AuthenticationServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -109,7 +109,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      * @throws IllegalArgumentException The supplied username doesn't exist, or the password is invalid.
      */
     @Override
-    public User authenticate(String username, String password) throws IllegalArgumentException {
+    public User authenticateUser(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new IllegalArgumentException("Invalid username or password");

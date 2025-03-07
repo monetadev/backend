@@ -4,7 +4,7 @@ import com.github.monetadev.backend.graphql.type.UserRegInput;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.UserRepository;
 
-public interface RegistrationService {
+public interface AuthenticationService {
     /**
      * Creates a new {@link User} per functional requirements in the backend and
      * best practices for password creation. Errors thrown are intentionally
@@ -35,5 +35,5 @@ public interface RegistrationService {
      * @return The user if valid credentials are supplied.
      * @throws IllegalArgumentException The supplied username doesn't exist, or the password is invalid.
      */
-    User authenticate(String username, String password) throws IllegalArgumentException;
+    User authenticateUser(String username, String password);
 }
