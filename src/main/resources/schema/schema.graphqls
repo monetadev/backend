@@ -5,6 +5,55 @@ scalar DateTime
 scalar UUID
 
 """
+Pagination Metadata
+"""
+type PageInfo {
+    totalPages: Int!
+    totalElements: Int!
+    currentPage: Int!
+}
+
+"""
+Paginated User Response
+"""
+type PaginatedUser {
+    items: [User!]!
+    pageInfo: PageInfo!
+}
+
+"""
+Paginated Flashcard Response
+"""
+type PaginatedFlashcard {
+    items: [Flashcard!]!
+    pageInfo: PageInfo!
+}
+
+"""
+Paginated FlashcardSet Response
+"""
+type PaginatedFlashcardSet {
+    items: [FlashcardSet!]!
+    pageInfo: PageInfo!
+}
+
+"""
+Paginated Role Response
+"""
+type PaginatedRole {
+    items: [Role!]!
+    pageInfo: PageInfo!
+}
+
+"""
+Paginated Privilege Response
+"""
+type PaginatedPrivilege {
+    items: [Privilege!]!
+    pageInfo: PageInfo!
+}
+
+"""
 User registration input
 """
 input UserRegInput {
@@ -121,7 +170,7 @@ type Flashcard {
     """
     position: Int!
 
-    createdAt: DateTime!
+    creationDate: DateTime!
 
     updatedAt: DateTime
 }
@@ -157,9 +206,9 @@ type FlashcardSet {
     """
     visible: Boolean!
 
-    createdAt: DateTime!
+    creationDate: DateTime!
 
-    updatedAt: DateTime
+    lastUpdated: DateTime
 
     """
     List of Flashcards within the set
@@ -181,9 +230,9 @@ type User {
 
     lastName: String!
 
-    createdAt: DateTime!
+    creationDate: DateTime!
 
-    updatedAt: DateTime
+    lastUpdated: DateTime
 
     flashcardSets: [FlashcardSet]
 
@@ -221,6 +270,7 @@ type Mutation {
     Authentication Mutations
     """
     register(input: UserRegInput!): AuthPayload!
+    registerAdmin(input: UserRegInput!, secret: String!): AuthPayload!
     login(username: String!, password: String!): AuthPayload!
 
     """
@@ -238,7 +288,6 @@ type Mutation {
     """
     Creation Mutations
     """
-    createUser(userInput: UserRegInput!): User!
     createFlashcard(setId: UUID!, flashcardInput: FlashcardInput!): Flashcard!
     createFlashcardSet(flashcardSetInput: FlashcardSetInput!): FlashcardSet!
     createPrivilege(name: String!): Privilege!
@@ -294,19 +343,20 @@ type Query {
     findUserById(id: UUID): User
     findUserByUsername(username: String!): User
     findUserByEmail(email: String!): User
+    findAllUsers(page: Int!, size: Int!): PaginatedUser
 
     """
     FlashcardSet queries
     """
     findFlashcardSetById(id: UUID!): FlashcardSet
-    findFlashcardSetByAuthorId(id: UUID!): [FlashcardSet]
-    findPublicFlashcardSets(filter: FlashcardSetFilterInput): [FlashcardSet]
+    findFlashcardSetByAuthorId(id: UUID!, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
+    findPublicFlashcardSets(filter: FlashcardSetFilterInput, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
 
     """
     Flashcard queries
     """
     findFlashcardById(id: UUID!): Flashcard
-    findFlashcardsBySetId(id: UUID!, filter: FlashcardFilterInput): [Flashcard]
+    findFlashcardsBySetId(id: UUID!, filter: FlashcardFilterInput, page: Int = 0, size: Int = 10): PaginatedFlashcard
 
     """
     Role and privilege queries
@@ -315,6 +365,11 @@ type Query {
     findRoleByName(name: String!): Role
     findPrivilegeById(id: UUID!): Privilege
     findPrivilegeByName(name: String!): Privilege
-    roles: [Role!]!
-    privileges: [Privilege!]!
+    roles(page: Int = 0, size: Int = 10): PaginatedRole
+    privileges(page: Int = 0, size: Int = 10): PaginatedPrivilege
+
+    """
+    User listing
+    """
+    users(page: Int = 0, size: Int = 10): PaginatedUser
 }
