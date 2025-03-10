@@ -1,15 +1,14 @@
 package com.github.monetadev.backend.service.impl;
 
+import com.github.monetadev.backend.exception.FlashcardNotFoundException;
 import com.github.monetadev.backend.model.Flashcard;
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.repository.FlashcardRepository;
-import com.github.monetadev.backend.repository.RoleRepository;
 import com.github.monetadev.backend.service.FlashcardService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,11 +25,13 @@ public class FlashcardServiceImpl implements FlashcardService {
      * Retrieves a {@link Flashcard} by its {@link UUID}.
      *
      * @param id The {@link UUID} of the {@link Flashcard} to find.
-     * @return An {@link Optional} containing the found {@link Flashcard}, or empty if not found.
+     * @return The found {@link Flashcard}.
+     * @throws FlashcardNotFoundException if no flashcard with the given ID exists.
      */
     @Override
-    public Optional<Flashcard> findFlashcardById(UUID id) {
-        return flashcardRepository.findById(id);
+    public Flashcard findFlashcardById(UUID id) throws FlashcardNotFoundException {
+        return flashcardRepository.findById(id)
+                .orElseThrow(() -> new FlashcardNotFoundException("Flashcard not found with ID: " + id));
     }
 
     /**
@@ -59,10 +60,14 @@ public class FlashcardServiceImpl implements FlashcardService {
      * Updates an existing {@link Flashcard}.
      *
      * @param flashcard The {@link Flashcard} entity to update.
-     * @return The updated {@link Flashcard} with generated fields.
+     * @return The updated {@link Flashcard}.
+     * @throws FlashcardNotFoundException if the flashcard to update does not exist.
      */
     @Override
-    public Flashcard updateFlashcard(Flashcard flashcard) {
+    public Flashcard updateFlashcard(Flashcard flashcard) throws FlashcardNotFoundException {
+        if (flashcard.getId() != null && !flashcardRepository.existsById(flashcard.getId())) {
+            throw new FlashcardNotFoundException("Cannot update non-existent flashcard with ID: " + flashcard.getId());
+        }
         return flashcardRepository.save(flashcard);
     }
 
@@ -70,9 +75,13 @@ public class FlashcardServiceImpl implements FlashcardService {
      * Deletes a {@link Flashcard} from the database.
      *
      * @param flashcard The {@link Flashcard} entity to delete.
+     * @throws FlashcardNotFoundException if the flashcard to delete does not exist.
      */
     @Override
-    public void deleteFlashcard(Flashcard flashcard) {
+    public void deleteFlashcard(Flashcard flashcard) throws FlashcardNotFoundException {
+        if (flashcard.getId() != null && !flashcardRepository.existsById(flashcard.getId())) {
+            throw new FlashcardNotFoundException("Cannot delete non-existent flashcard with ID: " + flashcard.getId());
+        }
         flashcardRepository.delete(flashcard);
     }
 }

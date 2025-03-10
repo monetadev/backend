@@ -1,18 +1,19 @@
 package com.github.monetadev.backend.service;
 
+import com.github.monetadev.backend.exception.FlashcardNotFoundException;
 import com.github.monetadev.backend.model.Flashcard;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface FlashcardService {
     /**
      * Retrieves a {@link Flashcard} by its {@link UUID}.
      * @param id The {@link UUID} of the {@link Flashcard} to find.
-     * @return An {@link Optional} containing the found {@link Flashcard}, or empty if not found.
+     * @return The found {@link Flashcard}.
+     * @throws FlashcardNotFoundException if no flashcard with the given ID exists.
      */
-    Optional<Flashcard> findFlashcardById(UUID id);
+    Flashcard findFlashcardById(UUID id) throws FlashcardNotFoundException;
 
     /**
      * Retrieves all {@link Flashcard} objects associated with a specific {@link com.github.monetadev.backend.model.FlashcardSet}.
@@ -31,13 +32,15 @@ public interface FlashcardService {
     /**
      * Updates an existing {@link Flashcard}.
      * @param flashcard The {@link Flashcard} entity to update.
-     * @return The updated {@link Flashcard} with generated fields.
+     * @return The updated {@link Flashcard}.
+     * @throws FlashcardNotFoundException if the flashcard to update does not exist.
      */
-    Flashcard updateFlashcard(Flashcard flashcard);
+    Flashcard updateFlashcard(Flashcard flashcard) throws FlashcardNotFoundException;
 
     /**
      * Deletes a {@link Flashcard} from the database.
      * @param flashcard The {@link Flashcard} entity to delete.
+     * @throws FlashcardNotFoundException if the flashcard to delete does not exist.
      */
-    void deleteFlashcard(Flashcard flashcard);
+    void deleteFlashcard(Flashcard flashcard) throws FlashcardNotFoundException;
 }

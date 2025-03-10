@@ -1,31 +1,37 @@
 package com.github.monetadev.backend.service;
 
+import com.github.monetadev.backend.exception.UserNotFoundException;
+import com.github.monetadev.backend.graphql.type.pagination.PaginatedResponse;
 import com.github.monetadev.backend.model.User;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
+    PaginatedResponse<User> getAllUsers(int page, int size);
+
     /**
      * Retrieves a {@link User} by their unique identifier.
      * @param id The {@link UUID} of the user to find.
-     * @return An {@link Optional} containing the found user, or empty if not found.
+     * @return The found {@link User}.
+     * @throws UserNotFoundException if no user with the given ID exists.
      */
-    Optional<User> findUserById(UUID id);
+    User findUserById(UUID id) throws UserNotFoundException;
 
     /**
      * Retrieves a {@link User} by their username.
      * @param username The username to search for.
-     * @return An {@link Optional} containing the found user, or empty if not found.
+     * @return The found {@link User}.
+     * @throws UserNotFoundException if no user with the given username exists.
      */
-    Optional<User> findUserByUsername(String username);
+    User findUserByUsername(String username) throws UserNotFoundException;
 
     /**
      * Retrieves a {@link User} by their email address.
      * @param email The email address to search for.
-     * @return An {@link Optional} containing the found user, or empty if not found.
+     * @return The found {@link User}.
+     * @throws UserNotFoundException if no user with the given email exists.
      */
-    Optional<User> findUserByEmail(String email);
+    User findUserByEmail(String email) throws UserNotFoundException;
 
     /**
      * Creates a new {@link User}.
@@ -37,13 +43,17 @@ public interface UserService {
     /**
      * Updates an existing {@link User}.
      * @param user The {@link User} entity to update.
-     * @return The updated {@link User} with generated fields.
+     * @return The updated {@link User}.
+     * @throws UserNotFoundException if the user to update does not exist.
      */
-    User updateUser(User user);
+    User updateUser(User user) throws UserNotFoundException;
 
     /**
      * Deletes a {@link User} by their unique identifier.
      * @param id The {@link UUID} of the user to delete.
+     * @throws UserNotFoundException if no user with the given ID exists.
      */
-    void deleteUser(UUID id);
+    void deleteUser(UUID id) throws UserNotFoundException;
+
+    Integer countUsersWithRole(String role);
 }

@@ -27,6 +27,8 @@ public interface AuthenticationService {
      */
     User registerNewUser(UserRegInput userRegInput);
 
+    User provisionAdmin(UserRegInput userRegInput, String secret);
+
     /**
      * Returns a {@link User} when given valid credentials.
      *
@@ -36,4 +38,12 @@ public interface AuthenticationService {
      * @throws IllegalArgumentException The supplied username doesn't exist, or the password is invalid.
      */
     User authenticateUser(String username, String password);
+
+    /**
+     * Returns the currently authenticated {@link User} in the backend.
+     *
+     * @return The currently authenticated user, throws an {@link com.github.monetadev.backend.exception.UserNotAuthenticatedException}
+     * if no {@link java.security.Principal} is found.
+     */
+    User getAuthenticatedUser();
 }
