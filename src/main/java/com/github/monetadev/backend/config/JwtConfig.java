@@ -17,6 +17,9 @@ public class JwtConfig {
     @Value("${jwt.expiration:86400}")
     private Long expirationSeconds;
 
+    @Value("${jwt.secured:false}")
+    private Boolean secured;
+
     @Bean
     public SecretKey secretKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
@@ -25,5 +28,10 @@ public class JwtConfig {
     @Bean
     public Duration expiration() {
         return Duration.ofSeconds(expirationSeconds);
+    }
+
+    @Bean
+    public Boolean isSecured() {
+        return secured;
     }
 }
