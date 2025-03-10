@@ -1,18 +1,19 @@
 package com.github.monetadev.backend.service;
 
+import com.github.monetadev.backend.exception.FlashcardSetNotFoundException;
 import com.github.monetadev.backend.model.FlashcardSet;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface FlashcardSetService {
     /**
      * Retrieves a {@link FlashcardSet} by its unique identifier.
      * @param id The {@link UUID} of the {@link FlashcardSet} to find.
-     * @return An {@link Optional} containing the found {@link FlashcardSet}, or empty if not found.
+     * @return The found {@link FlashcardSet}.
+     * @throws FlashcardSetNotFoundException if no flashcard set with the given ID exists.
      */
-    Optional<FlashcardSet> findFlashcardSetById(UUID id);
+    FlashcardSet findFlashcardSetById(UUID id) throws FlashcardSetNotFoundException;
 
     /**
      * Retrieves all {@link FlashcardSet} objects created by a specific {@link com.github.monetadev.backend.model.User}.
@@ -37,13 +38,15 @@ public interface FlashcardSetService {
     /**
      * Updates an existing {@link FlashcardSet}
      * @param flashcardSet The {@link FlashcardSet} entity to create.
-     * @return The updated {@link FlashcardSet} with generated fields.
+     * @return The updated {@link FlashcardSet}.
+     * @throws FlashcardSetNotFoundException if the flashcard set to update does not exist.
      */
-    FlashcardSet updateFlashcardSet(FlashcardSet flashcardSet);
+    FlashcardSet updateFlashcardSet(FlashcardSet flashcardSet) throws FlashcardSetNotFoundException;
 
     /**
      * Deletes a {@link FlashcardSet} by its {@link UUID}.
      * @param id The {@link UUID} of the {@link FlashcardSet} to delete.
+     * @throws FlashcardSetNotFoundException if no flashcard set with the given ID exists.
      */
-    void deleteFlashcardSet(UUID id);
+    void deleteFlashcardSet(UUID id) throws FlashcardSetNotFoundException;
 }

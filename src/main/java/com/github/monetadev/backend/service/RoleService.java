@@ -1,24 +1,26 @@
 package com.github.monetadev.backend.service;
 
+import com.github.monetadev.backend.exception.RoleNotFoundException;
 import com.github.monetadev.backend.model.Role;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface RoleService {
     /**
      * Retrieves a {@link Role} by its unique identifier.
      * @param id The {@link UUID} of the {@link Role} to find.
-     * @return An {@link Optional} containing the found {@link Role}, or empty if not found.
+     * @return The found {@link Role}.
+     * @throws RoleNotFoundException if no role with the given ID exists.
      */
-    Optional<Role> findRoleById(UUID id);
+    Role findRoleById(UUID id) throws RoleNotFoundException;
 
     /**
      * Retrieves a {@link Role} by its name.
      * @param name The name of the {@link Role} to find.
-     * @return An {@link Optional} containing the found {@link Role}, or empty if not found.
+     * @return The found {@link Role}.
+     * @throws RoleNotFoundException if no role with the given name exists.
      */
-    Optional<Role> findRoleByName(String name);
+    Role findRoleByName(String name) throws RoleNotFoundException;
 
     /**
      * Creates a new {@link Role}.
@@ -30,13 +32,16 @@ public interface RoleService {
     /**
      * Updates an existing {@link Role}.
      * @param role The {@link Role} entity to update.
-     * @return The updated {@link Role} with generated fields.
+     * @return The updated {@link Role}.
+     * @throws RoleNotFoundException if the role to update does not exist.
      */
-    Role updateRole(Role role);
+    Role updateRole(Role role) throws RoleNotFoundException;
 
     /**
      * Deletes a {@link Role} from the database.
      * @param role The {@link Role} entity to delete.
+     * @throws RoleNotFoundException if the role to delete does not exist.
      */
-    void deleteRole(Role role);
+    void deleteRole(Role role) throws RoleNotFoundException;
 }
+

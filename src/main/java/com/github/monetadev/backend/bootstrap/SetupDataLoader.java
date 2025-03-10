@@ -2,27 +2,35 @@ package com.github.monetadev.backend.bootstrap;
 
 import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.model.Role;
-import com.github.monetadev.backend.service.PrivilegeService;
-import com.github.monetadev.backend.service.RoleService;
+import com.github.monetadev.backend.repository.PrivilegeRepository;
+import com.github.monetadev.backend.repository.RoleRepository;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     private boolean isAlreadySetup = false;
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleRepository roleRepository;
+    private final PrivilegeRepository privilegeRepository;
 
-    @Autowired
-    private PrivilegeService privilegeService;
+    private static final Map<String, Set<String>> ROLE_PRIVILEGE_MAP = Map.of(
+            "ROLE_ADMIN", Set.of("READ_PRIVILEGE", "WRITE_PRIVILEGE", "DELETE_PRIVILEGE", "MANAGE_USERS", "MANAGE_AI_PERMISSIONS"),
+            "ROLE_USER", Set.of("READ_PRIVILEGE", "WRITE_PRIVILEGE"),
+            "ROLE_MODERATOR", Set.of("READ_PRIVILEGE", "WRITE_PRIVILEGE", "DELETE_PRIVILEGE")
+    );
+
+    public SetupDataLoader(RoleRepository roleRepository, PrivilegeRepository privilegeRepository) {
+        this.roleRepository = roleRepository;
+        this.privilegeRepository = privilegeRepository;
+    }
 
     @Override
     @Transactional
@@ -31,50 +39,47 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             return;
         }
 
-        if (!areBasePermissionsPresent()) {
-            setupDefaultPrivilegesAndRoles();
-        }
-
+        setupRolesAndPrivileges();
         isAlreadySetup = true;
     }
 
-    private boolean areBasePermissionsPresent() {
-        return roleService.findRoleByName("ROLE_ADMIN").isPresent() || roleService.findRoleByName("ROLE_USER").isPresent();
+    @Transactional
+    void setupRolesAndPrivileges() {
+        Map<String, Privilege> privilegeMap = createOrGetPrivileges(ROLE_PRIVILEGE_MAP.values().stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet()));
+
+        ROLE_PRIVILEGE_MAP.forEach((roleName, privilegeNames) ->
+                createRoleIfNotExists(roleName, privilegeNames.stream()
+                        .map(privilegeMap::get)
+                        .collect(Collectors.toSet())));
     }
 
     @Transactional
-    void setupDefaultPrivilegesAndRoles() {
-        Privilege readPrivilege = createPrivilegeIfNotExists("READ_PRIVILEGE");
-        Privilege writePrivilege = createPrivilegeIfNotExists("WRITE_PRIVILEGE");
+    Map<String, Privilege> createOrGetPrivileges(Set<String> privilegeNames) {
+        Map<String, Privilege> existingPrivileges = privilegeRepository.findAll().stream()
+                .collect(Collectors.toMap(Privilege::getName, p -> p));
 
-        Set<Privilege> adminPrivileges = new HashSet<>(Arrays.asList(readPrivilege, writePrivilege));
-        Set<Privilege> userPrivileges = new HashSet<>(Collections.singletonList(readPrivilege));
+        Map<String, Privilege> privilegeMap = new HashMap<>(existingPrivileges);
 
-        createRoleIfNotExists("ROLE_ADMIN", adminPrivileges);
-        createRoleIfNotExists("ROLE_USER", userPrivileges);
-
-    }
-
-    @Transactional
-    Privilege createPrivilegeIfNotExists(String name) {
-        Optional<Privilege> privilegeCandidate = privilegeService.findPrivilegeByName(name);
-        if (privilegeCandidate.isEmpty()) {
-            Privilege privilege = new Privilege();
-            privilege.setName(name);
-            return privilegeService.createPrivilege(privilege);
+        for (String privilegeName : privilegeNames) {
+            privilegeMap.computeIfAbsent(privilegeName, name -> {
+                Privilege newPrivilege = new Privilege();
+                newPrivilege.setName(name);
+                return privilegeRepository.save(newPrivilege);
+            });
         }
-        return privilegeCandidate.get();
+
+        return privilegeMap;
     }
 
     @Transactional
     void createRoleIfNotExists(String name, Set<Privilege> privileges) {
-        Optional<Role> role = roleService.findRoleByName(name);
-        if (role.isEmpty()) {
+        roleRepository.findByName(name).orElseGet(() -> {
             Role newRole = new Role();
             newRole.setName(name);
             newRole.setPrivileges(privileges);
-            roleService.createRole(newRole);
-        }
+            return roleRepository.save(newRole);
+        });
     }
 }
-
