@@ -1,10 +1,13 @@
 package com.github.monetadev.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +26,7 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -32,11 +36,13 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @CreationTimestamp
     @Column(name = "creation_date")
-    private LocalDateTime creationDate;
+    private OffsetDateTime creationDate;
 
+    @UpdateTimestamp
     @Column(name = "last_updated")
-    private LocalDateTime lastUpdated;
+    private OffsetDateTime lastUpdated;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -56,14 +62,4 @@ public class User {
             },
             orphanRemoval = true)
     private Set<FlashcardSet> flashcardSets;
-
-    @PrePersist
-    protected void onCreate() {
-        creationDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        lastUpdated = LocalDateTime.now();
-    }
 }
