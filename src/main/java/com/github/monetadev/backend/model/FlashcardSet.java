@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,16 +22,19 @@ public class FlashcardSet {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "visible", nullable = false)
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
     @CreationTimestamp
     @Column(name = "creation_date")
-    private Instant creationDate;
+    private OffsetDateTime creationDate;
 
     @UpdateTimestamp
     @Column(name = "last_updated")
-    private Instant lastUpdated;
+    private OffsetDateTime lastUpdated;
 
     @OneToMany(
             mappedBy = "flashcardSet",
@@ -44,5 +47,4 @@ public class FlashcardSet {
     @ManyToOne
     @JoinColumn(name = "author_user_id", nullable = false, updatable = false)
     private User author;
-
 }
