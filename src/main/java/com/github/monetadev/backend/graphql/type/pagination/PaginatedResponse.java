@@ -5,13 +5,17 @@ import lombok.*;
 import java.util.List;
 
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PaginatedResponse<T> {
     private List<T> items;
     private int totalPages;
     private long totalElements;
     private int currentPage;
+
+    public PageInfo getPageInfo() {
+        return new PageInfo(totalPages, totalElements, currentPage);
+    }
 
     public static abstract class PaginatedResponseBuilder<T, C extends PaginatedResponse<T>, B extends PaginatedResponseBuilder<T, C, B>> {
         protected List<T> items;

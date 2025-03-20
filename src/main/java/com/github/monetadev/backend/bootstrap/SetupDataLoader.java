@@ -22,8 +22,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final PrivilegeRepository privilegeRepository;
 
     private static final Map<String, Set<String>> ROLE_PRIVILEGE_MAP = Map.of(
-            "ROLE_ADMIN", Set.of("READ_PRIVILEGE", "WRITE_PRIVILEGE", "DELETE_PRIVILEGE", "MANAGE_USERS", "MANAGE_AI_PERMISSIONS"),
-            "ROLE_USER", Set.of("READ_PRIVILEGE", "WRITE_PRIVILEGE"),
+            "ROLE_ADMIN", Set.of(
+                    "MANAGE_USERS",
+                    "MANAGE_AI_PERMISSIONS",
+                    "USER_ADMIN",
+                    "ROLE_WRITE",
+                    "ROLE_READ",
+                    "MANAGE_USER_FLASHCARD"
+            ),
+            "ROLE_USER", Set.of(
+                    "ROLE_READ"
+            ),
             "ROLE_MODERATOR", Set.of("READ_PRIVILEGE", "WRITE_PRIVILEGE", "DELETE_PRIVILEGE")
     );
 

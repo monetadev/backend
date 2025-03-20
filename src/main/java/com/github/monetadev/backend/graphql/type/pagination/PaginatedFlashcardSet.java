@@ -13,6 +13,10 @@ public class PaginatedFlashcardSet extends PaginatedResponse<FlashcardSet> {
         super(flashcardSets, totalPages, totalElements, currentPage);
     }
 
+    public static Builder of() {
+        return new Builder();
+    }
+
     public static class Builder extends PaginatedResponseBuilder<FlashcardSet, PaginatedFlashcardSet, Builder>  {
         @Override
         protected Builder self() {

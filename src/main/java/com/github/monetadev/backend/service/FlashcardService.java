@@ -1,6 +1,7 @@
 package com.github.monetadev.backend.service;
 
 import com.github.monetadev.backend.exception.FlashcardNotFoundException;
+import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcard;
 import com.github.monetadev.backend.model.Flashcard;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface FlashcardService {
      * @param setId The {@link UUID} of the {@link com.github.monetadev.backend.model.FlashcardSet} to query for.
      * @return A {@link List} of {@link Flashcard} objects belonging to the specified {@link com.github.monetadev.backend.model.FlashcardSet}, may be empty.
      */
-    List<Flashcard> findFlashcardsBySetId(UUID setId);
+    PaginatedFlashcard findFlashcardsBySetId(UUID setId, int page, int size);
 
     /**
      * Creates a new {@link Flashcard}.
