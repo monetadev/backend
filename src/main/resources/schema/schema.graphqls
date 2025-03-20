@@ -1,11 +1,11 @@
 """
-Custom scalars
+Custom scalars for specialized data types
 """
 scalar DateTime
 scalar UUID
 
 """
-Pagination Metadata
+Pagination types and metadata
 """
 type PageInfo {
     totalPages: Int!
@@ -13,48 +13,33 @@ type PageInfo {
     currentPage: Int!
 }
 
-"""
-Paginated User Response
-"""
 type PaginatedUser {
     items: [User!]!
     pageInfo: PageInfo!
 }
 
-"""
-Paginated Flashcard Response
-"""
 type PaginatedFlashcard {
     items: [Flashcard!]!
     pageInfo: PageInfo!
 }
 
-"""
-Paginated FlashcardSet Response
-"""
 type PaginatedFlashcardSet {
     items: [FlashcardSet!]!
     pageInfo: PageInfo!
 }
 
-"""
-Paginated Role Response
-"""
 type PaginatedRole {
     items: [Role!]!
     pageInfo: PageInfo!
 }
 
-"""
-Paginated Privilege Response
-"""
 type PaginatedPrivilege {
     items: [Privilege!]!
     pageInfo: PageInfo!
 }
 
 """
-User registration input
+Input types for various operations
 """
 input UserRegInput {
     username: String!
@@ -62,38 +47,24 @@ input UserRegInput {
     firstName: String!
     lastName: String!
     password: String!
-    confirmPassword: String!
 }
 
-"""
-Authentication response
-"""
-type AuthPayload {
-    token: String!
-    user: User!
-}
-
-"""
-Flashcard creation or update input
-"""
 input FlashcardInput {
     term: String!
     definition: String!
     position: Int!
 }
 
-"""
-Flashcard set creation or update
-"""
 input FlashcardSetInput {
     title: String
     description: String
-    visible: Boolean!
+    isPublic: Boolean!
+    flashcards: [FlashcardInput]!
     #tags: [String!]
 }
 
 """
-Flashcard Filtering Input
+Filtering input types
 """
 input FlashcardFilterInput {
     """
@@ -108,9 +79,6 @@ input FlashcardFilterInput {
     createdBefore: DateTime
 }
 
-"""
-Flashcard Set Filtering Input
-"""
 input FlashcardSetFilterInput {
     """
     Search term
@@ -120,7 +88,7 @@ input FlashcardSetFilterInput {
     """
     Filter by visibility
     """
-    onlyVisible: Boolean
+    isPublic: Boolean
 
     """
     Filter by creation date
@@ -130,7 +98,7 @@ input FlashcardSetFilterInput {
 }
 
 """
-AI Document Input
+AI generation input types
 """
 input DocumentInput {
     documentText: String
@@ -138,9 +106,6 @@ input DocumentInput {
     documentUrl: String
 }
 
-"""
-AI Generation Options
-"""
 input AIGenerationOptions {
     aiProvider: String!  # "OPENAI", "ANTHROPIC", "OLLAMA"
     modelName: String!
@@ -150,6 +115,9 @@ input AIGenerationOptions {
     topic: String
 }
 
+"""
+Core domain types
+"""
 type Flashcard {
     """
     Unique identifier
@@ -175,17 +143,6 @@ type Flashcard {
     updatedAt: DateTime
 }
 
-type GeneratedFlashcard {
-    term: String!
-    definition: String!
-    position: Int!
-}
-
-type FlashcardGenerationResult {
-    temporaryId: UUID!
-    generatedFlashcards: [GeneratedFlashcard!]!
-}
-
 type FlashcardSet {
     """
     Unique identifier
@@ -195,7 +152,7 @@ type FlashcardSet {
     """
     Unique identifier that links THIS FlashcardSet to the original User
     """
-    authorUserId: UUID!
+    author: User!
 
     title: String
 
@@ -204,7 +161,7 @@ type FlashcardSet {
     """
     Determine whether THIS FlashcardSet is visible to the public or just to the original User
     """
-    visible: Boolean!
+    isPublic: Boolean!
 
     creationDate: DateTime!
 
@@ -242,6 +199,23 @@ type User {
     roles: [Role]
 }
 
+"""
+AI generation response types
+"""
+type GeneratedFlashcard {
+    term: String!
+    definition: String!
+    position: Int!
+}
+
+type FlashcardGenerationResult {
+    temporaryId: UUID!
+    generatedFlashcards: [GeneratedFlashcard!]!
+}
+
+"""
+Authorization types
+"""
 type Role {
     """
     Uniquely identify every role
@@ -263,16 +237,17 @@ type Privilege {
 }
 
 """
-Used to Perform Crud Operations
+Mutations for performing CRUD operations and other actions
 """
 type Mutation {
     """
     Authentication Mutations
     """
-    register(input: UserRegInput!): AuthPayload!
-    registerAdmin(input: UserRegInput!, secret: String!): AuthPayload!
-    login(username: String!, password: String!): AuthPayload!
+    register(input: UserRegInput!): User!
+    registerAdmin(input: UserRegInput!, secret: String!): User!
+    login(username: String!, password: String!): User!
 
+    # TODO
     """
     AI Generation Mutations
     """
@@ -281,63 +256,45 @@ type Mutation {
         temporaryId: UUID!,
         title: String!,
         description: String,
-        visible: Boolean!,
+        isPublic: Boolean!,
         flashcards: [FlashcardInput!]!
     ): FlashcardSet!
 
     """
-    Creation Mutations
+    Flashcard and FlashcardSet Mutations
     """
-    createFlashcard(setId: UUID!, flashcardInput: FlashcardInput!): Flashcard!
     createFlashcardSet(flashcardSetInput: FlashcardSetInput!): FlashcardSet!
-    createPrivilege(name: String!): Privilege!
-    createRole(name: String!): Role!
+    updateFlashcardSet(id: UUID!, flashcardSetInput: FlashcardSetInput): FlashcardSet!
+    deleteFlashcardSet(userId: UUID!, setId: UUID!): String!
 
     """
-    Update Mutations
+    User Mutations
     """
     updateUser(id: UUID!, username: String, email: String, firstName: String, lastName: String): User!
-    updateFlashcard(id: UUID!, flashcardInput: FlashcardInput): Flashcard!
-    updateFlashcardSet(id: UUID!, setInput: FlashcardSetInput): FlashcardSet!
-    updatePrivilege(id: UUID!, name: String): Privilege!
+    deleteUser(id: UUID!): UUID!
+
+    """
+    Role and Privilege Mutations
+    """
+    createRole(name: String!): Role!
     updateRole(id: UUID, name: String): Role!
+    deleteRole(id: UUID!): UUID!
 
     """
-    Delete Mutations
-    """
-    deleteUser(id: UUID!): Boolean!
-    deleteFlashcardSet(id: UUID!): Boolean!
-    deleteFlashcard(id: UUID!): Boolean!
-    deletePrivilege(id: UUID!): Boolean!
-    deleteRole(id: UUID!): Boolean!
-
-    """
-    Assign a Role to a User
+    Role and User Assignment Mutations
     """
     assignRoleToUser(userId: UUID!, roleId: UUID!): User!
-
-    """
-    Remove a Role from a User
-    """
     removeRoleFromUser(userId: UUID!, roleId: UUID!): User!
-
-    """
-    Assign Privilege to Role
-    """
     assignPrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
-
-    """
-    Remove Privilege from Role
-    """
     removePrivilegeFromRole(roleId: UUID!, privilegeId: UUID!): Role!
 }
 
 """
-Queries used for retrieving data
+Queries for retrieving data
 """
 type Query {
     """
-    User queries
+    User Queries
     """
     me: User
     findUserById(id: UUID): User
@@ -346,30 +303,17 @@ type Query {
     findAllUsers(page: Int!, size: Int!): PaginatedUser
 
     """
-    FlashcardSet queries
+    FlashcardSet Queries
     """
     findFlashcardSetById(id: UUID!): FlashcardSet
     findFlashcardSetByAuthorId(id: UUID!, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
     findPublicFlashcardSets(filter: FlashcardSetFilterInput, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
 
     """
-    Flashcard queries
-    """
-    findFlashcardById(id: UUID!): Flashcard
-    findFlashcardsBySetId(id: UUID!, filter: FlashcardFilterInput, page: Int = 0, size: Int = 10): PaginatedFlashcard
-
-    """
-    Role and privilege queries
+    Role and Privilege Queries
     """
     findRoleById(id: UUID!): Role
     findRoleByName(name: String!): Role
-    findPrivilegeById(id: UUID!): Privilege
-    findPrivilegeByName(name: String!): Privilege
     roles(page: Int = 0, size: Int = 10): PaginatedRole
-    privileges(page: Int = 0, size: Int = 10): PaginatedPrivilege
-
-    """
-    User listing
-    """
-    users(page: Int = 0, size: Int = 10): PaginatedUser
+    privileges: [Privilege!]!
 }
