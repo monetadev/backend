@@ -1,6 +1,8 @@
 package com.github.monetadev.backend.service;
 
 import com.github.monetadev.backend.exception.FlashcardSetNotFoundException;
+import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
+import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.FlashcardSet;
 
 import java.util.List;
@@ -20,33 +22,35 @@ public interface FlashcardSetService {
      * @param authorId The {@link UUID} of the author {@link com.github.monetadev.backend.model.User}.
      * @return A {@link List} of {@link FlashcardSet}, empty if none found.
      */
-    List<FlashcardSet> findFlashcardSetsByAuthorId(UUID authorId);
+    PaginatedFlashcardSet findFlashcardSetsByAuthorId(UUID authorId, int page, int size);
 
     /**
      * Retrieves all publicly available {@link FlashcardSet}.
      * @return A {@link List} of {@link FlashcardSet}, empty if none found.
      */
-    List<FlashcardSet> findPublicFlashcardSets();
+    PaginatedFlashcardSet findPublicFlashcardSets(int page, int size);
 
     /**
      * Creates a new {@link FlashcardSet}.
-     * @param flashcardSet The {@link FlashcardSet} entity to create.
+     * @param flashcardSetInput The {@link FlashcardSetInput} DTO to persist.
      * @return The persisted {@link FlashcardSet} with generated fields.
      */
-    FlashcardSet createFlashcardSet(FlashcardSet flashcardSet);
+    FlashcardSet createFlashcardSet(FlashcardSetInput flashcardSetInput);
 
     /**
      * Updates an existing {@link FlashcardSet}
-     * @param flashcardSet The {@link FlashcardSet} entity to create.
+     * @param id The {@link UUID} of the flashcard set to update.
+     * @param flashcardSetInput The {@link FlashcardSetInput} DTO to persist.
      * @return The updated {@link FlashcardSet}.
      * @throws FlashcardSetNotFoundException if the flashcard set to update does not exist.
      */
-    FlashcardSet updateFlashcardSet(FlashcardSet flashcardSet) throws FlashcardSetNotFoundException;
+    FlashcardSet updateFlashcardSet(UUID id, FlashcardSetInput flashcardSetInput) throws FlashcardSetNotFoundException;
 
     /**
      * Deletes a {@link FlashcardSet} by its {@link UUID}.
      * @param id The {@link UUID} of the {@link FlashcardSet} to delete.
+     * @return The title of the deleted flashcard set.
      * @throws FlashcardSetNotFoundException if no flashcard set with the given ID exists.
      */
-    void deleteFlashcardSet(UUID id) throws FlashcardSetNotFoundException;
+    String deleteFlashcardSet(UUID id) throws FlashcardSetNotFoundException;
 }

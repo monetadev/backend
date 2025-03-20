@@ -51,9 +51,10 @@ public interface UserService {
     /**
      * Deletes a {@link User} by their unique identifier.
      * @param id The {@link UUID} of the user to delete.
+     * @return The uuid of the deleted user.
      * @throws UserNotFoundException if no user with the given ID exists.
      */
-    void deleteUser(UUID id) throws UserNotFoundException;
+    UUID deleteUser(UUID id) throws UserNotFoundException;
 
     Integer countUsersWithRole(String role);
 }

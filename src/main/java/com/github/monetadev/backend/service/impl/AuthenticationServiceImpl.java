@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,24 +49,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Creates a new {@link User} per functional requirements in the backend and
-     * best practices for password creation. Errors thrown are intentionally
-     * generic as to reduce attack surface.
-     * </br></br>
-     * The function will first check if required arguments are not null, then
-     * ensures that the repeated password matches the first, then ensures that
-     * the password matches the following criteria: length is between 8 and 64
-     * characters, contains an uppercase and lowercase letter, contains a
-     * number, and contains any of the following special characters:
-     * </br></br>
-     * !@#$%^&*()_+-=[]{};':"\|,.<>/?
-     * </br></br>
-     * Following that, we will then query the {@link UserRepository} to see
-     * if the username already exists, then if the email already exists.
-     * Once all criteria has been met, we save the user using the repository.
+     * {@inheritDoc}
      *
-     * @param userRegInput The {@link UserRegInput} from GraphQL to persist.
-     * @return The persisted {@link User} with generated fields.
+     * The function will first check if required arguments are not null, then
+     * ensures that the password matches the following criteria: length is
+     * between 8 and 64 characters, contains an uppercase and lowercase letter,
+     * contains a number, and contains any of the following special characters:
+     * </br>
+     * <p>
+     * !@#$%^&*()_+-=[]{};':"\|,.<>/?
+     * </p>
+     * </br>
+     * Following that, the {@link UserRepository} is queried to see
+     * if the username already exists, then if the email already exists.
+     * Once all criteria has been met, the user is saved using the repository.
      */
     @Override
     public User registerNewUser(UserRegInput userRegInput) {
@@ -82,9 +77,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         if (userRegInput.getFirstName() == null || userRegInput.getLastName() == null) {
             throw new IllegalArgumentException("First name and last name is required");
-        }
-        if (!userRegInput.getPassword().equals(userRegInput.getConfirmPassword())) {
-            throw new IllegalArgumentException("Invalid email, username, or password");
         }
         if (userRegInput.getPassword().length() < 8
                 || userRegInput.getPassword().length() > 64
@@ -110,6 +102,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return userRepository.save(user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public User provisionAdmin(UserRegInput userRegInput, String secret) {
         if (!adminProvisionIsEnabled) {
@@ -129,12 +124,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Returns a {@link User} when given valid credentials.
-     *
-     * @param username The username to authenticate.
-     * @param password The password to authenticate.
-     * @return The user if valid credentials are supplied.
-     * @throws IllegalArgumentException The supplied username doesn't exist, or the password is invalid.
+     * {@inheritDoc}
      */
     @Override
     public User authenticateUser(String username, String password) {
@@ -149,10 +139,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Returns the currently authenticated {@link User} in the backend.
-     *
-     * @return The currently authenticated user, throws an {@link UserNotAuthenticatedException}
-     * if no {@link Principal} is found.
+     * {@inheritDoc}
      */
     @Override
     public User getAuthenticatedUser() {

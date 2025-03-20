@@ -1,9 +1,16 @@
 package com.github.monetadev.backend.service.impl;
 
+import com.github.monetadev.backend.exception.PrivilegeNotFoundException;
+import com.github.monetadev.backend.exception.RoleAlreadyExistsException;
 import com.github.monetadev.backend.exception.RoleNotFoundException;
+import com.github.monetadev.backend.graphql.type.pagination.PaginatedRole;
+import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.model.Role;
+import com.github.monetadev.backend.repository.PrivilegeRepository;
 import com.github.monetadev.backend.repository.RoleRepository;
 import com.github.monetadev.backend.service.RoleService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,17 +20,30 @@ import java.util.UUID;
 @Transactional
 public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
+    private final PrivilegeRepository privilegeRepository;
 
-    public RoleServiceImpl(RoleRepository roleRepository) {
+    public RoleServiceImpl(RoleRepository roleRepository, PrivilegeRepository privilegeRepository) {
         this.roleRepository = roleRepository;
+        this.privilegeRepository = privilegeRepository;
     }
 
     /**
-     * Retrieves a {@link Role} by its unique identifier.
-     *
-     * @param id The {@link UUID} of the {@link Role} to find.
-     * @return The found {@link Role}.
-     * @throws RoleNotFoundException if no role with the given ID exists.
+     * {@inheritDoc}
+     */
+    @Override
+    public PaginatedRole getAllRoles(int page, int size) {
+        Page<Role> roles = roleRepository.findAll(PageRequest.of(page, size));
+
+        return PaginatedRole.of()
+                .items(roles.getContent())
+                .totalPages(roles.getTotalPages())
+                .totalElements(roles.getTotalElements())
+                .currentPage(roles.getNumber())
+                .build();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Role findRoleById(UUID id) throws RoleNotFoundException {
@@ -32,11 +52,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * Retrieves a {@link Role} by its name.
-     *
-     * @param name The name of the {@link Role} to find.
-     * @return The found {@link Role}.
-     * @throws RoleNotFoundException if no role with the given name exists.
+     * {@inheritDoc}
      */
     @Override
     public Role findRoleByName(String name) throws RoleNotFoundException {
@@ -45,22 +61,28 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * Creates a new {@link Role}.
-     *
-     * @param role The {@link Role} entity to persist.
-     * @return The persisted {@link Role} with generated fields.
+     * {@inheritDoc}
      */
     @Override
     public Role createRole(Role role) {
+        if (roleRepository.findByName(role.getName()).isPresent()) {
+            throw new RoleAlreadyExistsException("Role with name " + role.getName() + " already exists");
+        }
         return roleRepository.save(role);
     }
 
     /**
-     * Updates an existing {@link Role}.
-     *
-     * @param role The {@link Role} entity to update.
-     * @return The updated {@link Role}.
-     * @throws RoleNotFoundException if the role to update does not exist.
+     * {@inheritDoc}
+     */
+    @Override
+    public Role createRole(String name) {
+        Role role = new Role();
+        role.setName(name);
+        return createRole(role);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Role updateRole(Role role) throws RoleNotFoundException {
@@ -71,16 +93,41 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * Deletes a {@link Role} from the database.
-     *
-     * @param role The {@link Role} entity to delete.
-     * @throws RoleNotFoundException if the role to delete does not exist.
+     * {@inheritDoc}
      */
     @Override
-    public void deleteRole(Role role) throws RoleNotFoundException {
-        if (role.getId() != null && !roleRepository.existsById(role.getId())) {
-            throw new RoleNotFoundException("Cannot delete non-existent role with ID: " + role.getId());
+    public Role updateRole(UUID id, String name) throws RoleNotFoundException {
+        if (id == null || !roleRepository.existsById(id)) {
+            throw new RoleNotFoundException("Cannot update non-existent role with ID: " + id);
         }
-        roleRepository.delete(role);
+        Role role = findRoleById(id);
+        role.setName(name);
+        return roleRepository.save(role);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UUID deleteRole(UUID id) throws RoleNotFoundException {
+        if (id == null) {
+            throw new IllegalArgumentException("Cannot delete a null role");
+        }
+        if (!roleRepository.existsById(id)) {
+            throw new RoleNotFoundException("Cannot delete non-existent role with ID: " + id);
+        }
+        roleRepository.deleteById(id);
+        return id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer countRolesWithPrivilege(String privilege) {
+        Privilege userPrivilege = privilegeRepository.findByName(privilege)
+                .orElseThrow(() -> new PrivilegeNotFoundException("Privilege not found with name: " + privilege));
+
+        return userPrivilege.getRoles().size();
     }
 }

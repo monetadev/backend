@@ -2,7 +2,6 @@ package com.github.monetadev.backend.service.impl;
 
 import com.github.monetadev.backend.exception.RoleNotFoundException;
 import com.github.monetadev.backend.exception.UserNotFoundException;
-import com.github.monetadev.backend.graphql.type.pagination.PaginatedResponse;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedUser;
 import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
@@ -107,14 +106,16 @@ public class UserServiceImpl implements UserService {
      * Deletes a {@link User} by their unique identifier.
      *
      * @param id The {@link UUID} of the user to delete.
+     * @return The uuid of the deleted user.
      * @throws UserNotFoundException if no user with the given ID exists.
      */
     @Override
-    public void deleteUser(UUID id) throws UserNotFoundException {
+    public UUID deleteUser(UUID id) throws UserNotFoundException {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("Cannot delete non-existent user with ID: " + id);
         }
         userRepository.deleteById(id);
+        return id;
     }
 
     @Override

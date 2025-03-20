@@ -1,10 +1,13 @@
 package com.github.monetadev.backend.service.impl;
 
 import com.github.monetadev.backend.exception.FlashcardNotFoundException;
+import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcard;
 import com.github.monetadev.backend.model.Flashcard;
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.repository.FlashcardRepository;
 import com.github.monetadev.backend.service.FlashcardService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +17,6 @@ import java.util.UUID;
 @Service
 @Transactional
 public class FlashcardServiceImpl implements FlashcardService {
-
     private final FlashcardRepository flashcardRepository;
 
     public FlashcardServiceImpl(FlashcardRepository flashcardRepository) {
@@ -41,8 +43,15 @@ public class FlashcardServiceImpl implements FlashcardService {
      * @return A {@link List} of {@link Flashcard} objects belonging to the specified {@link FlashcardSet}, may be empty.
      */
     @Override
-    public List<Flashcard> findFlashcardsBySetId(UUID setId) {
-        return flashcardRepository.findAllByFlashcardSetId(setId);
+    public PaginatedFlashcard findFlashcardsBySetId(UUID setId, int page, int size) {
+        Page<Flashcard> flashcards = flashcardRepository.findAllByFlashcardSetId(setId, PageRequest.of(page, size));
+
+        return PaginatedFlashcard.of()
+                .items(flashcards.getContent())
+                .totalPages(flashcards.getTotalPages())
+                .totalElements(flashcards.getTotalElements())
+                .currentPage(flashcards.getNumber())
+                .build();
     }
 
     /**
