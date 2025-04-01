@@ -3,6 +3,7 @@ Custom scalars for specialized data types
 """
 scalar DateTime
 scalar UUID
+scalar Upload
 
 """
 Pagination types and metadata
@@ -187,6 +188,8 @@ type User {
 
     lastName: String!
 
+    profilePicture: String
+
     creationDate: DateTime!
 
     lastUpdated: DateTime
@@ -234,6 +237,11 @@ type Privilege {
     id: UUID!
 
     name: String!
+}
+
+extend type Mutation {
+    uploadProfilePicture(input: Upload!): String
+    uploadDocument(input: Upload!): Boolean
 }
 
 """
