@@ -6,15 +6,17 @@ import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSe
 import com.github.monetadev.backend.model.Flashcard;
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.repository.FlashcardSetRepository;
-import com.github.monetadev.backend.service.security.AuthenticationService;
 import com.github.monetadev.backend.service.base.FlashcardSetService;
+import com.github.monetadev.backend.service.security.AuthenticationService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional

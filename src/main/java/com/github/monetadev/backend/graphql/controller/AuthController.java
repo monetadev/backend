@@ -2,8 +2,8 @@ package com.github.monetadev.backend.graphql.controller;
 
 import com.github.monetadev.backend.graphql.type.UserRegInput;
 import com.github.monetadev.backend.model.User;
-import com.github.monetadev.backend.service.security.JwtService;
 import com.github.monetadev.backend.service.security.AuthenticationService;
+import com.github.monetadev.backend.service.security.JwtService;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;

@@ -6,7 +6,10 @@ import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSe
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.service.base.FlashcardService;
 import com.github.monetadev.backend.service.base.FlashcardSetService;
-import com.netflix.graphql.dgs.*;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.UUID;
