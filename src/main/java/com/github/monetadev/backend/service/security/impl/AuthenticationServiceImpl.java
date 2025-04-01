@@ -1,4 +1,4 @@
-package com.github.monetadev.backend.service.impl;
+package com.github.monetadev.backend.service.security.impl;
 
 import com.github.monetadev.backend.exception.AdminProvisioningDisabledException;
 import com.github.monetadev.backend.exception.InvalidAdminSecretException;
@@ -10,7 +10,7 @@ import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.RoleRepository;
 import com.github.monetadev.backend.repository.UserRepository;
 import com.github.monetadev.backend.security.jwt.JwtUserDetails;
-import com.github.monetadev.backend.service.AuthenticationService;
+import com.github.monetadev.backend.service.security.AuthenticationService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;

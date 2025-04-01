@@ -1,4 +1,4 @@
-package com.github.monetadev.backend.service.impl;
+package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.RoleNotFoundException;
 import com.github.monetadev.backend.exception.UserNotFoundException;
@@ -6,8 +6,8 @@ import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.RoleRepository;
 import com.github.monetadev.backend.repository.UserRepository;
-import com.github.monetadev.backend.service.UserRoleService;
-import com.github.monetadev.backend.service.UserService;
+import com.github.monetadev.backend.service.base.UserRoleService;
+import com.github.monetadev.backend.service.base.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

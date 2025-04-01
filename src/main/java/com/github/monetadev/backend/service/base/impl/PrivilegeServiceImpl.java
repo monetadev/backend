@@ -1,9 +1,9 @@
-package com.github.monetadev.backend.service.impl;
+package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.PrivilegeNotFoundException;
 import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.repository.PrivilegeRepository;
-import com.github.monetadev.backend.service.PrivilegeService;
+import com.github.monetadev.backend.service.base.PrivilegeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

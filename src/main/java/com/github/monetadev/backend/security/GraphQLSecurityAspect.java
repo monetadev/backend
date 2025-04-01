@@ -4,7 +4,7 @@ import com.github.monetadev.backend.exception.PrivilegeAuthorizationException;
 import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
-import com.github.monetadev.backend.service.AuthenticationService;
+import com.github.monetadev.backend.service.security.AuthenticationService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

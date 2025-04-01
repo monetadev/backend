@@ -1,13 +1,11 @@
 package com.github.monetadev.backend.graphql.controller;
 
 import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
-import com.github.monetadev.backend.graphql.type.filters.FlashcardFilterInput;
 import com.github.monetadev.backend.graphql.type.filters.FlashcardSetFilterInput;
-import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcard;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.FlashcardSet;
-import com.github.monetadev.backend.service.FlashcardService;
-import com.github.monetadev.backend.service.FlashcardSetService;
+import com.github.monetadev.backend.service.base.FlashcardService;
+import com.github.monetadev.backend.service.base.FlashcardSetService;
 import com.netflix.graphql.dgs.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 

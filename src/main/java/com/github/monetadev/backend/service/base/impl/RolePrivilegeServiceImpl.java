@@ -1,4 +1,4 @@
-package com.github.monetadev.backend.service.impl;
+package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.PrivilegeNotFoundException;
 import com.github.monetadev.backend.exception.RoleNotFoundException;
@@ -6,8 +6,8 @@ import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.repository.PrivilegeRepository;
 import com.github.monetadev.backend.repository.RoleRepository;
-import com.github.monetadev.backend.service.RolePrivilegeService;
-import com.github.monetadev.backend.service.RoleService;
+import com.github.monetadev.backend.service.base.RolePrivilegeService;
+import com.github.monetadev.backend.service.base.RoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

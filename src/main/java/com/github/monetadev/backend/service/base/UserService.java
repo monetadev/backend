@@ -1,4 +1,4 @@
-package com.github.monetadev.backend.service;
+package com.github.monetadev.backend.service.base;
 
 import com.github.monetadev.backend.exception.UserNotFoundException;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedResponse;

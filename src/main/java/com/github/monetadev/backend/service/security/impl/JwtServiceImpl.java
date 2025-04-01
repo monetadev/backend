@@ -1,12 +1,13 @@
-package com.github.monetadev.backend.security.jwt;
+package com.github.monetadev.backend.service.security.impl;
 
 import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
+import com.github.monetadev.backend.security.jwt.JwtUserDetails;
+import com.github.monetadev.backend.service.security.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,15 +20,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class JwtService {
+public class JwtServiceImpl implements JwtService {
     private final SecretKey secretKey;
     private final Duration jwtExpiration;
 
-    public JwtService(@Autowired SecretKey secretKey, @Autowired Duration jwtExpiration) {
+    public JwtServiceImpl(SecretKey secretKey, Duration jwtExpiration) {
         this.secretKey = secretKey;
         this.jwtExpiration = jwtExpiration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String generateToken(User user) {
         Instant now = Instant.now();
         Instant expiry = now.plus(jwtExpiration);
@@ -53,6 +58,10 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
 
@@ -76,6 +85,10 @@ public class JwtService {
         return new UsernamePasswordAuthenticationToken(userDetails, token, grantedAuthorities);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -84,6 +97,10 @@ public class JwtService {
                 .getPayload();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Boolean isValidToken(String token) {
         try {
             Claims claims = Jwts.parser()

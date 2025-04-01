@@ -1,5 +1,6 @@
 package com.github.monetadev.backend.security.jwt;
 
+import com.github.monetadev.backend.service.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

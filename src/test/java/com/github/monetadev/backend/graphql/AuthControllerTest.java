@@ -1,8 +1,8 @@
 package com.github.monetadev.backend.graphql;
 
 import com.github.monetadev.backend.model.User;
-import com.github.monetadev.backend.security.jwt.JwtService;
-import com.github.monetadev.backend.service.AuthenticationService;
+import com.github.monetadev.backend.service.security.JwtService;
+import com.github.monetadev.backend.service.security.AuthenticationService;
 import com.netflix.graphql.dgs.DgsQueryExecutor;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
-package com.github.monetadev.backend.service.impl;
+package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.FlashcardNotFoundException;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcard;
 import com.github.monetadev.backend.model.Flashcard;
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.repository.FlashcardRepository;
-import com.github.monetadev.backend.service.FlashcardService;
+import com.github.monetadev.backend.service.base.FlashcardService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

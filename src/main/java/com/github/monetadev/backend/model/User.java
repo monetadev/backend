@@ -36,6 +36,10 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Lob
+    @Column(name = "profile_picture", columnDefinition = "TEXT")
+    private String profilePicture;
+
     @CreationTimestamp
     @Column(name = "creation_date")
     private OffsetDateTime creationDate;
