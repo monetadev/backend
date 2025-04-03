@@ -36,10 +36,6 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Lob
-    @Column(name = "profile_picture", columnDefinition = "TEXT")
-    private String profilePicture;
-
     @CreationTimestamp
     @Column(name = "creation_date")
     private OffsetDateTime creationDate;
@@ -57,6 +53,14 @@ public class User {
     private Set<Role> roles;
 
     @OneToMany(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<File> files;
+
+    @OneToMany(
             mappedBy = "author",
             fetch = FetchType.LAZY,
             cascade = {
@@ -64,6 +68,7 @@ public class User {
                     CascadeType.MERGE,
                     CascadeType.REMOVE
             },
-            orphanRemoval = true)
+            orphanRemoval = true
+    )
     private Set<FlashcardSet> flashcardSets;
 }

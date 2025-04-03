@@ -39,6 +39,14 @@ type PaginatedPrivilege {
     pageInfo: PageInfo!
 }
 
+type ImageUploadResult {
+    filename: String!
+    originalFilename: String!
+    size: Int!
+    contentType: String!
+    path: String!
+}
+
 """
 Input types for various operations
 """
@@ -174,6 +182,29 @@ type FlashcardSet {
     flashcards: [Flashcard]
 }
 
+type File {
+    """
+    Unique identifier
+    """
+    id: UUID!
+
+    filename: String!
+
+    originalFilename: String!
+
+    contentType: String!
+
+    filePath: String!
+
+    md5Sum: String!
+
+    uploadedDate: DateTime!
+
+    fileSize: Int!
+
+    uploader: User!
+}
+
 type User {
     """
     Unique identifier
@@ -188,13 +219,13 @@ type User {
 
     lastName: String!
 
-    profilePicture: String
-
     creationDate: DateTime!
 
     lastUpdated: DateTime
 
     flashcardSets: [FlashcardSet]
+
+    files: [File]
 
     """
     THIS User's assigned roles
@@ -240,8 +271,11 @@ type Privilege {
 }
 
 extend type Mutation {
-    uploadProfilePicture(input: Upload!): String
+    uploadProfilePicture(input: Upload!): ImageUploadResult!
     uploadDocument(input: Upload!): Boolean
+
+    deleteCurrentUserProfilePicture: Boolean!
+    deleteUserProfilePicture(id: UUID!): Boolean!
 }
 
 """
