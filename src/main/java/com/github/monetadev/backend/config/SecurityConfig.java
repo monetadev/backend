@@ -1,6 +1,8 @@
 package com.github.monetadev.backend.config;
 
+import com.github.monetadev.backend.config.prop.FileProperties;
 import com.github.monetadev.backend.security.jwt.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -18,9 +20,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final FileProperties fileProperties;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    @Autowired
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, FileProperties fileProperties) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.fileProperties = fileProperties;
     }
 
     @Bean
@@ -32,6 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/graphql").permitAll()
                         .requestMatchers("/graphiql").permitAll()
+                        .requestMatchers("/" + fileProperties.getProfilePictureDirName() + "/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

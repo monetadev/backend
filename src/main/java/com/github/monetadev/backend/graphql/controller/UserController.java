@@ -1,18 +1,16 @@
 package com.github.monetadev.backend.graphql.controller;
 
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedUser;
-import com.github.monetadev.backend.model.Privilege;
 import com.github.monetadev.backend.model.User;
-import com.github.monetadev.backend.service.PrivilegeService;
-import com.github.monetadev.backend.service.UserRoleService;
-import com.github.monetadev.backend.service.UserService;
+import com.github.monetadev.backend.service.base.PrivilegeService;
+import com.github.monetadev.backend.service.base.UserRoleService;
+import com.github.monetadev.backend.service.base.UserService;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import java.util.List;
 import java.util.UUID;
 
 @DgsComponent

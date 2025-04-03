@@ -3,6 +3,7 @@ Custom scalars for specialized data types
 """
 scalar DateTime
 scalar UUID
+scalar Upload
 
 """
 Pagination types and metadata
@@ -36,6 +37,14 @@ type PaginatedRole {
 type PaginatedPrivilege {
     items: [Privilege!]!
     pageInfo: PageInfo!
+}
+
+type ImageUploadResult {
+    filename: String!
+    originalFilename: String!
+    size: Int!
+    contentType: String!
+    path: String!
 }
 
 """
@@ -173,6 +182,29 @@ type FlashcardSet {
     flashcards: [Flashcard]
 }
 
+type File {
+    """
+    Unique identifier
+    """
+    id: UUID!
+
+    filename: String!
+
+    originalFilename: String!
+
+    contentType: String!
+
+    filePath: String!
+
+    md5Sum: String!
+
+    uploadedDate: DateTime!
+
+    fileSize: Int!
+
+    uploader: User!
+}
+
 type User {
     """
     Unique identifier
@@ -192,6 +224,8 @@ type User {
     lastUpdated: DateTime
 
     flashcardSets: [FlashcardSet]
+
+    files: [File]
 
     """
     THIS User's assigned roles
@@ -234,6 +268,14 @@ type Privilege {
     id: UUID!
 
     name: String!
+}
+
+extend type Mutation {
+    uploadProfilePicture(input: Upload!): ImageUploadResult!
+    uploadDocument(input: Upload!): Boolean
+
+    deleteCurrentUserProfilePicture: Boolean!
+    deleteUserProfilePicture(id: UUID!): Boolean!
 }
 
 """

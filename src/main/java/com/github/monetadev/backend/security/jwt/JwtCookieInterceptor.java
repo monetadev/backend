@@ -1,5 +1,6 @@
 package com.github.monetadev.backend.security.jwt;
 
+import com.github.monetadev.backend.service.security.JwtService;
 import graphql.GraphQLContext;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;

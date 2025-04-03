@@ -4,7 +4,7 @@ import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.security.jwt.JwtUserDetails;
-import com.github.monetadev.backend.service.FlashcardSetService;
+import com.github.monetadev.backend.service.base.FlashcardSetService;
 import com.netflix.graphql.dgs.DgsQueryExecutor;
 import graphql.ExecutionResult;
 import org.intellij.lang.annotations.Language;

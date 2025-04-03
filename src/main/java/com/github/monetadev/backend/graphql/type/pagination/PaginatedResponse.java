@@ -1,6 +1,9 @@
 package com.github.monetadev.backend.graphql.type.pagination;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
