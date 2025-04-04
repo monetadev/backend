@@ -47,6 +47,14 @@ type ImageUploadResult {
     path: String!
 }
 
+type DocumentUploadResult {
+    filename: String!
+    originalFilename: String!
+    size: Int!
+    contentType: String!
+    path: String!
+}
+
 """
 Input types for various operations
 """
@@ -272,7 +280,7 @@ type Privilege {
 
 extend type Mutation {
     uploadProfilePicture(input: Upload!): ImageUploadResult!
-    uploadDocument(input: Upload!): Boolean
+    uploadDocument(input: Upload!): DocumentUploadResult!
 
     deleteCurrentUserProfilePicture: Boolean!
     deleteUserProfilePicture(id: UUID!): Boolean!

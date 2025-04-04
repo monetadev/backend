@@ -1,6 +1,7 @@
 package com.github.monetadev.backend.service.file.impl;
 
 import com.github.monetadev.backend.config.prop.FileProperties;
+import com.github.monetadev.backend.exception.InvalidFileUploadException;
 import com.github.monetadev.backend.exception.ProfilePictureDeleteException;
 import com.github.monetadev.backend.exception.ProfilePictureUploadException;
 import com.github.monetadev.backend.graphql.type.file.ImageUploadResult;
@@ -71,18 +72,18 @@ public class ProfilePictureService implements FileTypeService {
     @Override
     public void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("Image file is empty");
+            throw new InvalidFileUploadException("Image file is empty");
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !getAllowedMimeTypes().contains(contentType)) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileUploadException(
                     "Invalid image type. Allowed types: " + String.join(", ", getAllowedMimeTypes())
             );
         }
 
         if (file.getSize() > getMaxFileSize()) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileUploadException(
                     "Image exceeds maximum size of " + (getMaxFileSize() / (1024 * 1024)) + "MB"
             );
         }

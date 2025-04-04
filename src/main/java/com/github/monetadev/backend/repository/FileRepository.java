@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public interface FileRepository extends JpaRepository<File, UUID> {
     List<File> getFilesByUserId(UUID id);
+    Optional<File> findByIdAndUser(UUID id, User user);
     Optional<File> findByUserAndFilename(User user, String filename);
     Optional<File> findFileByFilePathContainsAndUserId(String filepath, UUID userId);
+    List<File> findAllByFilePathContainsAndUser(String filepath, User user);
 }

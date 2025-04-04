@@ -40,8 +40,6 @@ public interface PersistenceService {
      */
     String calculateHash(MultipartFile file);
 
-    // Existing methods...
-
     /**
      * Deletes a file from both the filesystem and database
      *
