@@ -40,23 +40,19 @@ public interface PersistenceService {
      */
     String calculateHash(MultipartFile file);
 
-    // Existing methods...
-
     /**
      * Deletes a file from both the filesystem and database
      *
      * @param file The file entity to delete
      * @return true if successfully deleted, false otherwise
-     * @throws IOException If an I/O error occurs during file deletion
      */
-    boolean deleteFile(File file) throws IOException;
+    boolean deleteFile(File file);
 
     /**
      * Deletes a file from the filesystem only
      *
      * @param filePath Path to the file to delete
      * @return true if successfully deleted, false otherwise
-     * @throws IOException If an I/O error occurs during file deletion
      */
-    boolean deleteFileFromFilesystem(String filePath) throws IOException;
+    boolean deleteFileFromFilesystem(String filePath);
 }

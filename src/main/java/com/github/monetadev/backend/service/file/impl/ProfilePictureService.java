@@ -1,13 +1,14 @@
 package com.github.monetadev.backend.service.file.impl;
 
 import com.github.monetadev.backend.config.prop.FileProperties;
-import com.github.monetadev.backend.exception.ProfilePictureDeleteException;
+import com.github.monetadev.backend.exception.InvalidFileUploadException;
 import com.github.monetadev.backend.exception.ProfilePictureUploadException;
 import com.github.monetadev.backend.graphql.type.file.ImageUploadResult;
 import com.github.monetadev.backend.model.File;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.FileRepository;
 import com.github.monetadev.backend.service.base.UserService;
+import com.github.monetadev.backend.service.file.FileService;
 import com.github.monetadev.backend.service.file.FileTypeService;
 import com.github.monetadev.backend.service.file.PersistenceService;
 import com.github.monetadev.backend.service.security.AuthenticationService;
@@ -28,17 +29,19 @@ public class ProfilePictureService implements FileTypeService {
     private final FileRepository fileRepository;
     private final UserService userService;
     private final FileProperties fileProperties;
+    private final FileService fileService;
 
     public ProfilePictureService(PersistenceService persistenceService,
                                  AuthenticationService authenticationService,
                                  FileRepository fileRepository,
                                  UserService userService,
-                                 FileProperties fileProperties) {
+                                 FileProperties fileProperties, FileService fileService) {
         this.persistenceService = persistenceService;
         this.authenticationService = authenticationService;
         this.fileRepository = fileRepository;
         this.userService = userService;
         this.fileProperties = fileProperties;
+        this.fileService = fileService;
     }
 
     /**
@@ -71,18 +74,18 @@ public class ProfilePictureService implements FileTypeService {
     @Override
     public void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("Image file is empty");
+            throw new InvalidFileUploadException("Image file is empty");
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !getAllowedMimeTypes().contains(contentType)) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileUploadException(
                     "Invalid image type. Allowed types: " + String.join(", ", getAllowedMimeTypes())
             );
         }
 
         if (file.getSize() > getMaxFileSize()) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileUploadException(
                     "Image exceeds maximum size of " + (getMaxFileSize() / (1024 * 1024)) + "MB"
             );
         }
@@ -139,11 +142,8 @@ public class ProfilePictureService implements FileTypeService {
         }
         Optional<File> existingProfilePicture = fileRepository.findByUserAndFilename(user, user.getId().toString());
         if (existingProfilePicture.isPresent()) {
-            try {
-                return persistenceService.deleteFile(existingProfilePicture.get());
-            } catch (IOException e) {
-                throw new ProfilePictureDeleteException("Could not delete profile picture with id " + user.getId());
-            }
+            fileService.deleteFile(existingProfilePicture.get());
+            return true;
         }
         return false;
     }

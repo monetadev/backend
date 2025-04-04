@@ -12,5 +12,9 @@ import org.springframework.context.annotation.Configuration;
 public class FileProperties {
     private String profilePictureDirName = "profile";
     private String profilePictureMimeType = "image/jpeg,image/png,image/gif,image/bmp,image/webp";
-    private long profilePictureMaxSize = 2097152;
+    private long profilePictureMaxSize = 2097152; // 2MB
+
+    private String documentDirName = "docs";
+    private String documentMimeType = "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,text/plain,text/csv,text/html,application/rtf,application/xml,application/json";
+    private long documentMaxSize = 20971520; // 20MB
 }
