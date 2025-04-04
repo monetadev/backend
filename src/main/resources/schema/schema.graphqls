@@ -281,6 +281,7 @@ type Privilege {
 extend type Mutation {
     uploadProfilePicture(input: Upload!): ImageUploadResult!
     uploadDocument(input: Upload!): DocumentUploadResult!
+    deleteDocument(id: UUID!): UUID!
 
     deleteCurrentUserProfilePicture: Boolean!
     deleteUserProfilePicture(id: UUID!): Boolean!

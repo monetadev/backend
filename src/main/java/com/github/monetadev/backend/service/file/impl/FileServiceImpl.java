@@ -8,6 +8,7 @@ import com.github.monetadev.backend.model.File;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.FileRepository;
 import com.github.monetadev.backend.service.file.FileService;
+import com.github.monetadev.backend.service.file.PersistenceService;
 import com.github.monetadev.backend.service.security.AuthenticationService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -26,13 +27,15 @@ public class FileServiceImpl implements FileService {
     private final FileRepository fileRepository;
     private final AuthenticationService authenticationService;
     private final StorageProperties storageProperties;
+    private final PersistenceService persistenceService;
 
     public FileServiceImpl(FileRepository fileRepository,
                            AuthenticationService authenticationService,
-                           StorageProperties storageProperties) {
+                           StorageProperties storageProperties, PersistenceService persistenceService) {
         this.fileRepository = fileRepository;
         this.authenticationService = authenticationService;
         this.storageProperties = storageProperties;
+        this.persistenceService = persistenceService;
     }
 
     /**
@@ -57,11 +60,27 @@ public class FileServiceImpl implements FileService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public UUID deleteFile(File file) {
         UUID rv = file.getId();
         file.getUser().getFiles().remove(file);
+        persistenceService.deleteFile(file);
         fileRepository.delete(file);
         return rv;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public UUID deleteFile(UUID id) {
+        File file = fileRepository.findById(id)
+                .orElseThrow(() -> new FileNotFoundException(id.toString()));
+        file.getUser().getFiles().remove(file);
+        persistenceService.deleteFile(file);
+        fileRepository.delete(file);
+        return id;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.github.monetadev.backend.service.file.impl;
 
 import com.github.monetadev.backend.config.prop.StorageProperties;
+import com.github.monetadev.backend.exception.StorageException;
 import com.github.monetadev.backend.model.File;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.FileRepository;
@@ -133,7 +134,7 @@ public class PersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteFile(File file) throws IOException {
+    public boolean deleteFile(File file) {
         if (file == null) {
             return false;
         }
@@ -153,14 +154,18 @@ public class PersistenceServiceImpl implements PersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteFileFromFilesystem(String filePath) throws IOException {
+    public boolean deleteFileFromFilesystem(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             return false;
         }
         Path path = Paths.get(storageProperties.getDataDirectory(), filePath);
 
         if (Files.exists(path)) {
-            Files.delete(path);
+            try {
+                Files.delete(path);
+            } catch (IOException ignored) {
+                throw new StorageException("Could not delete file: " + filePath);
+            }
             return true;
         }
         return false;

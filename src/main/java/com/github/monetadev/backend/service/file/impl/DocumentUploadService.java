@@ -1,7 +1,6 @@
 package com.github.monetadev.backend.service.file.impl;
 
 import com.github.monetadev.backend.config.prop.FileProperties;
-import com.github.monetadev.backend.exception.DocumentDeleteException;
 import com.github.monetadev.backend.exception.DocumentUploadException;
 import com.github.monetadev.backend.exception.InvalidFileUploadException;
 import com.github.monetadev.backend.graphql.type.file.DocumentUploadResult;
@@ -125,11 +124,7 @@ public class DocumentUploadService implements FileTypeService {
             return false;
         }
 
-        try {
-            return persistenceService.deleteFile(document);
-        } catch (IOException e) {
-            throw new DocumentDeleteException("Could not delete document with id " + document.getId());
-        }
+        return persistenceService.deleteFile(document);
     }
 
     @Transactional

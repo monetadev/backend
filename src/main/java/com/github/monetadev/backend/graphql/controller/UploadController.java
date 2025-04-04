@@ -1,6 +1,9 @@
 package com.github.monetadev.backend.graphql.controller;
 
+import com.github.monetadev.backend.graphql.type.file.DocumentUploadResult;
 import com.github.monetadev.backend.graphql.type.file.ImageUploadResult;
+import com.github.monetadev.backend.service.file.FileService;
+import com.github.monetadev.backend.service.file.impl.DocumentUploadService;
 import com.github.monetadev.backend.service.file.impl.ProfilePictureService;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -14,9 +17,13 @@ import java.util.UUID;
 public class UploadController {
 
     private final ProfilePictureService profilePictureService;
+    private final DocumentUploadService documentUploadService;
+    private final FileService fileService;
 
-    public UploadController(ProfilePictureService profilePictureService) {
+    public UploadController(ProfilePictureService profilePictureService, DocumentUploadService documentUploadService, FileService fileService) {
         this.profilePictureService = profilePictureService;
+        this.documentUploadService = documentUploadService;
+        this.fileService = fileService;
     }
 
     @DgsMutation
@@ -33,5 +40,16 @@ public class UploadController {
     @DgsMutation
     public boolean deleteUserProfilePicture(@InputArgument UUID id) {
         return profilePictureService.deleteUserProfilePicture(id);
+    }
+
+    @DgsMutation
+    public DocumentUploadResult uploadDocument(DataFetchingEnvironment env) {
+        MultipartFile file = env.getArgument("input");
+        return documentUploadService.uploadDocument(file);
+    }
+
+    @DgsMutation
+    public UUID deleteDocument(@InputArgument UUID id) {
+        return fileService.deleteFile(id);
     }
 }

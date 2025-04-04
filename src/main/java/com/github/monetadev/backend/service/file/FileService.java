@@ -32,6 +32,14 @@ public interface FileService {
     UUID deleteFile(File file);
 
     /**
+     * Deletes a file from the system.
+     *
+     * @param id the UUID of the file entity to be deleted
+     * @return the UUID of the deleted file
+     */
+    UUID deleteFile(UUID id);
+
+    /**
      * Retrieves a specific file by its unique identifier.
      *
      * @param id The unique identifier of the file
