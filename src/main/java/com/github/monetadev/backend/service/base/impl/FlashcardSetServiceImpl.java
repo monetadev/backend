@@ -1,6 +1,7 @@
 package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.FlashcardSetNotFoundException;
+import com.github.monetadev.backend.graphql.type.FlashcardInput;
 import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.Flashcard;
@@ -14,9 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -93,18 +92,39 @@ public class FlashcardSetServiceImpl implements FlashcardSetService {
         flashcardSet.setTitle(flashcardSetInput.getTitle());
         flashcardSet.setDescription(flashcardSetInput.getDescription());
         flashcardSet.setIsPublic(flashcardSetInput.getIsPublic());
-        List<Flashcard> flashcards = new ArrayList<>();
-        if (flashcardSetInput.getFlashcards() != null && !flashcardSetInput.getFlashcards().isEmpty()) {
-            flashcardSetInput.getFlashcards().forEach(flashcard -> {
-                Flashcard flashcardToAdd = new Flashcard();
-                flashcardToAdd.setFlashcardSet(flashcardSet);
-                flashcardToAdd.setTerm(flashcard.getTerm());
-                flashcardToAdd.setDefinition(flashcard.getDefinition());
-                flashcardToAdd.setPosition(flashcard.getPosition());
-                flashcards.add(flashcardToAdd);
-            });
+
+        Map<Integer, Flashcard> existingFlashcardsByPosition = new HashMap<>();
+        if (flashcardSet.getFlashcards() != null) {
+            for (Flashcard flashcard : flashcardSet.getFlashcards()) {
+                existingFlashcardsByPosition.put(flashcard.getPosition(), flashcard);
+            }
         }
-        flashcardSet.setFlashcards(flashcards);
+
+        List<Flashcard> updatedFlashcards = new ArrayList<>();
+
+        if (flashcardSetInput.getFlashcards() != null && !flashcardSetInput.getFlashcards().isEmpty()) {
+            List<FlashcardInput> sortedInputs = new ArrayList<>(flashcardSetInput.getFlashcards());
+            sortedInputs.sort(Comparator.comparing(FlashcardInput::getPosition));
+
+            for (int i = 0; i < sortedInputs.size(); i++) {
+                FlashcardInput input = sortedInputs.get(i);
+                int normalizedPosition = i + 1;
+
+                Flashcard flashcard;
+                if (existingFlashcardsByPosition.containsKey(input.getPosition())) {
+                    flashcard = existingFlashcardsByPosition.get(input.getPosition());
+                } else {
+                    flashcard = new Flashcard();
+                    flashcard.setFlashcardSet(flashcardSet);
+                }
+                flashcard.setTerm(input.getTerm());
+                flashcard.setDefinition(input.getDefinition());
+                flashcard.setPosition(normalizedPosition);
+                updatedFlashcards.add(flashcard);
+            }
+        }
+
+        flashcardSet.setFlashcards(updatedFlashcards);
         return flashcardSetRepository.save(flashcardSet);
     }
 

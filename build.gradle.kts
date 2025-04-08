@@ -21,59 +21,47 @@ configurations {
 
 repositories {
     mavenCentral()
+
+    maven { url = uri("https://repo.spring.io/milestone") }
+    maven { url = uri("https://repo.spring.io/snapshot") }
+    maven {
+        name = "Central Portal Snapshots"
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+    }
 }
 
 extra["netflixDgsVersion"] = "10.0.3"
-extra["springAiVersion"] = "1.0.0-M5"
+extra["springAiVersion"] = "1.0.0-M6"
 
 dependencies {
     implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
-    //implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("name.nkonev.multipart-spring-graphql:multipart-spring-graphql:1.5.+")
     //implementation("org.springframework.boot:spring-boot-starter-validation")
-    //implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.netflix.graphql.dgs:graphql-dgs-spring-graphql-starter")
     implementation("com.netflix.graphql.dgs:graphql-dgs-extended-scalars")
     implementation ("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly ("io.jsonwebtoken:jjwt-jackson:0.12.6")
-    //implementation("org.springframework.ai:spring-ai-anthropic-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-azure-openai-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-chroma-store-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-markdown-document-reader")
-    //implementation("org.springframework.ai:spring-ai-mistral-ai-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-ollama-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-qdrant-store-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-stability-ai-spring-boot-starter")
-    //implementation("org.springframework.ai:spring-ai-tika-document-reader")
-    //implementation("org.springframework.ai:spring-ai-transformers-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.ai:spring-ai-tika-document-reader")
+    implementation("org.springframework.ai:spring-ai-ollama-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-qdrant-store-spring-boot-starter")
     implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
+    implementation("org.apache.commons:commons-text:1.13.0")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    //developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     runtimeOnly("org.postgresql:postgresql")
-    //runtimeOnly("org.postgresql:r2dbc-postgresql")
-    //developmentOnly("org.springframework.ai:spring-ai-spring-boot-docker-compose")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.mockito:mockito-core:5.15.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("com.netflix.graphql.dgs:graphql-dgs-spring-graphql-starter-test")
-    //testImplementation("io.projectreactor:reactor-test")
-    //testImplementation("org.springframework.ai:spring-ai-spring-boot-testcontainers")
     testImplementation("org.springframework.security:spring-security-test")
-    //testImplementation("org.testcontainers:chromadb")
-    testImplementation("org.testcontainers:junit-jupiter")
-    //testImplementation("org.testcontainers:ollama")
-    testImplementation("org.testcontainers:postgresql")
     runtimeOnly("com.h2database:h2")
-    //testImplementation("org.testcontainers:qdrant")
-    //testImplementation("org.testcontainers:r2dbc")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    //implementation("com.tailrocks.graphql:graphql-datetime-spring-boot-starter:6.0.0")
 }
 
 dependencyManagement {
