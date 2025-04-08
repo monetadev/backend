@@ -7,6 +7,7 @@ import com.github.monetadev.backend.graphql.type.file.DocumentUploadResult;
 import com.github.monetadev.backend.model.File;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.FileRepository;
+import com.github.monetadev.backend.service.ai.DocumentEmbedService;
 import com.github.monetadev.backend.service.file.FileTypeService;
 import com.github.monetadev.backend.service.file.PersistenceService;
 import com.github.monetadev.backend.service.security.AuthenticationService;
@@ -26,13 +27,15 @@ public class DocumentUploadService implements FileTypeService {
     private final AuthenticationService authenticationService;
     private final PersistenceService persistenceService;
     private final FileRepository fileRepository;
+    private final DocumentEmbedService documentEmbedService;
 
     @Autowired
-    public DocumentUploadService(FileProperties fileProperties, AuthenticationService authenticationService, PersistenceService persistenceService, FileRepository fileRepository) {
+    public DocumentUploadService(FileProperties fileProperties, AuthenticationService authenticationService, PersistenceService persistenceService, FileRepository fileRepository, DocumentEmbedService documentEmbedService) {
         this.fileProperties = fileProperties;
         this.authenticationService = authenticationService;
         this.persistenceService = persistenceService;
         this.fileRepository = fileRepository;
+        this.documentEmbedService = documentEmbedService;
     }
     /**
      * {@inheritDoc}
@@ -108,6 +111,7 @@ public class DocumentUploadService implements FileTypeService {
     @Transactional
     public DocumentUploadResult uploadDocument(MultipartFile file) {
         File fileMetadata = processAndSaveFile(file);
+        documentEmbedService.embedFile(fileMetadata);
 
         return DocumentUploadResult.builder()
                 .filename(fileMetadata.getFilename())
@@ -123,6 +127,7 @@ public class DocumentUploadService implements FileTypeService {
         if (document == null) {
             return false;
         }
+        documentEmbedService.deleteEmbeddingById(document.getId());
 
         return persistenceService.deleteFile(document);
     }
