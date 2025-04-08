@@ -368,3 +368,7 @@ type Query {
     roles(page: Int = 0, size: Int = 10): PaginatedRole
     privileges: [Privilege!]!
 }
+
+type Subscription {
+    flashcardSetChat(conversationId: UUID!, setId: UUID!, message: String!): String
+}
