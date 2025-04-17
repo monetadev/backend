@@ -31,7 +31,7 @@ repositories {
 }
 
 extra["netflixDgsVersion"] = "10.0.3"
-extra["springAiVersion"] = "1.0.0-M6"
+extra["springAiVersion"] = "1.0.0-M7"
 
 dependencies {
     implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -43,11 +43,12 @@ dependencies {
     implementation ("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly ("io.jsonwebtoken:jjwt-jackson:0.12.6")
-    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
+    implementation("org.springframework.ai:spring-ai-rag")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.ai:spring-ai-tika-document-reader")
-    implementation("org.springframework.ai:spring-ai-ollama-spring-boot-starter")
-    implementation("org.springframework.ai:spring-ai-qdrant-store-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-starter-model-ollama")
+    implementation("org.springframework.ai:spring-ai-starter-vector-store-qdrant")
     implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
     implementation("org.apache.commons:commons-text:1.13.0")
