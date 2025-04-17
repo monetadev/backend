@@ -37,6 +37,8 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
         List<Document> documents = tikaReader.get();
         documents.forEach(document -> {
             document.getMetadata().put("docId", file.getId().toString());
+            document.getMetadata().put("originalFilename", file.getOriginalFilename());
+            document.getMetadata().put("filename", file.getFilename());
             document.getMetadata().put("userId", authenticationService.getAuthenticatedUser().getId().toString());
         });
         vectorStore.accept(new TokenTextSplitter().apply(documents));
