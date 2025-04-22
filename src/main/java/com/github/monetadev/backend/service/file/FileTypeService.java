@@ -18,11 +18,6 @@ public interface FileTypeService {
     List<String> getAllowedMimeTypes();
 
     /**
-     * Get maximum file size in bytes
-     */
-    long getMaxFileSize();
-
-    /**
      * Validate a file of this type
      */
     void validateFile(MultipartFile file);
