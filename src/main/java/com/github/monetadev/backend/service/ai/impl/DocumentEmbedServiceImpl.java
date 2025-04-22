@@ -5,6 +5,9 @@ import com.github.monetadev.backend.service.ai.DocumentEmbedService;
 import com.github.monetadev.backend.service.file.FileService;
 import com.github.monetadev.backend.service.security.AuthenticationService;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.ExtractedTextFormatter;
+import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
+import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.filter.Filter;
@@ -33,16 +36,10 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
     @Override
     public String embedFile(File file) {
         Resource resource = fileService.getResourceByFile(file);
-        TikaDocumentReader tikaReader = new TikaDocumentReader(resource);
-        List<Document> documents = tikaReader.get();
-        documents.forEach(document -> {
-            document.getMetadata().put("docId", file.getId().toString());
-            document.getMetadata().put("originalFilename", file.getOriginalFilename());
-            document.getMetadata().put("filename", file.getFilename());
-            document.getMetadata().put("userId", authenticationService.getAuthenticatedUser().getId().toString());
-        });
-        vectorStore.accept(new TokenTextSplitter().apply(documents));
-        return file.getOriginalFilename();
+        if (file.getContentType().equals("application/pdf")) {
+            return embedFileByDocumentReader(file, resource, DocumentType.STRUCTURED_PDF);
+        }
+        return embedFileByDocumentReader(file, resource, DocumentType.OTHER);
     }
 
     /**
@@ -56,5 +53,38 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
                 new Filter.Value(id.toString())
         );
         vectorStore.delete(expression);
+    }
+
+    private String embedFileByDocumentReader(File file, Resource fileResource, DocumentType type) {
+        List<Document> documents = switch (type) {
+            case OTHER, PDF -> {
+                TikaDocumentReader tika = new TikaDocumentReader(fileResource);
+                yield tika.get();
+            }
+            case STRUCTURED_PDF -> {
+                ParagraphPdfDocumentReader paragraphPdf = new ParagraphPdfDocumentReader(fileResource, PdfDocumentReaderConfig.builder()
+                        .withPageTopMargin(0)
+                        .withPageExtractedTextFormatter(ExtractedTextFormatter.builder()
+                                .withNumberOfTopTextLinesToDelete(0)
+                                .build())
+                        .withPagesPerDocument(1)
+                        .build());
+                yield paragraphPdf.get();
+            }
+        };
+        documents.forEach(document -> {
+            document.getMetadata().put("docId", file.getId().toString());
+            document.getMetadata().put("originalFilename", file.getOriginalFilename());
+            document.getMetadata().put("filename", file.getFilename());
+            document.getMetadata().put("userId", authenticationService.getAuthenticatedUser().getId().toString());
+        });
+        vectorStore.accept(new TokenTextSplitter().apply(documents));
+        return file.getOriginalFilename();
+    }
+
+    private enum DocumentType {
+        STRUCTURED_PDF,
+        PDF,
+        OTHER
     }
 }
