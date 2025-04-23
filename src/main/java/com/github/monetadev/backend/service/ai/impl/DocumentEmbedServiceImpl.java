@@ -37,7 +37,11 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
     public String embedFile(File file) {
         Resource resource = fileService.getResourceByFile(file);
         if (file.getContentType().equals("application/pdf")) {
-            return embedFileByDocumentReader(file, resource, DocumentType.STRUCTURED_PDF);
+            try {
+                return embedFileByDocumentReader(file, resource, DocumentType.STRUCTURED_PDF);
+            } catch (Exception ignored) {
+                return embedFileByDocumentReader(file, resource, DocumentType.PDF);
+            }
         }
         return embedFileByDocumentReader(file, resource, DocumentType.OTHER);
     }
