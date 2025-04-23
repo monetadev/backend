@@ -1,8 +1,8 @@
 package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.FlashcardSetNotFoundException;
-import com.github.monetadev.backend.graphql.type.FlashcardInput;
-import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.Flashcard;
 import com.github.monetadev.backend.model.FlashcardSet;

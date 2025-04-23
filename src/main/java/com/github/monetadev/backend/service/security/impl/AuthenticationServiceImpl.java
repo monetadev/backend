@@ -4,7 +4,7 @@ import com.github.monetadev.backend.exception.AdminProvisioningDisabledException
 import com.github.monetadev.backend.exception.InvalidAdminSecretException;
 import com.github.monetadev.backend.exception.RoleNotFoundException;
 import com.github.monetadev.backend.exception.UserNotAuthenticatedException;
-import com.github.monetadev.backend.graphql.type.UserRegInput;
+import com.github.monetadev.backend.graphql.type.input.UserRegInput;
 import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
 import com.github.monetadev.backend.repository.RoleRepository;
