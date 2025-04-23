@@ -1,374 +1,546 @@
-"""
-Custom scalars for specialized data types
-"""
+# Scalar Types
+"""Custom scalar representing an ISO-8601 formatted date and time"""
 scalar DateTime
+
+"""Custom scalar representing a universally unique identifier (UUID)"""
 scalar UUID
+
+"""Custom scalar representing a file upload, compatible with multipart form data"""
 scalar Upload
 
-"""
-Pagination types and metadata
-"""
+# Common and Pagination Types
+"""Pagination metadata"""
 type PageInfo {
+    """Total number of pages available"""
     totalPages: Int!
+
+    """Total count of elements across all pages"""
     totalElements: Int!
+
+    """Current page number (zero-based)"""
     currentPage: Int!
 }
 
+"""Paginated collection of User objects"""
 type PaginatedUser {
+    """User items on the current page"""
     items: [User!]!
+
+    """Pagination metadata"""
     pageInfo: PageInfo!
 }
 
-type PaginatedFlashcard {
-    items: [Flashcard!]!
-    pageInfo: PageInfo!
-}
-
+"""Paginated collection of FlashcardSet objects"""
 type PaginatedFlashcardSet {
+    """FlashcardSet items on the current page"""
     items: [FlashcardSet!]!
+
+    """Pagination metadata"""
     pageInfo: PageInfo!
 }
 
+"""Paginated collection of Role objects"""
 type PaginatedRole {
+    """Role items on the current page"""
     items: [Role!]!
+
+    """Pagination metadata"""
     pageInfo: PageInfo!
 }
 
-type PaginatedPrivilege {
-    items: [Privilege!]!
-    pageInfo: PageInfo!
-}
-
+"""Result of an image upload operation"""
 type ImageUploadResult {
+    """System-generated filename on the server"""
     filename: String!
+
+    """Original filename from the user's system"""
     originalFilename: String!
+
+    """File size in bytes"""
     size: Int!
+
+    """MIME type of the uploaded image"""
     contentType: String!
+
+    """Server path where the image is stored"""
     path: String!
 }
 
+"""Result of a document upload operation"""
 type DocumentUploadResult {
+    """System-generated filename on the server"""
     filename: String!
+
+    """Original filename from the user's system"""
     originalFilename: String!
+
+    """File size in bytes"""
     size: Int!
+
+    """MIME type of the uploaded document"""
     contentType: String!
+
+    """Server path where the document is stored"""
     path: String!
 }
 
-"""
-Input types for various operations
-"""
-input UserRegInput {
-    username: String!
-    email: String!
-    firstName: String!
-    lastName: String!
-    password: String!
-}
-
-input FlashcardInput {
-    term: String!
-    definition: String!
-    position: Int!
-}
-
-input FlashcardSetInput {
-    title: String
-    description: String
-    isPublic: Boolean!
-    flashcards: [FlashcardInput]!
-    #tags: [String!]
-}
-
-"""
-Filtering input types
-"""
-input FlashcardFilterInput {
-    """
-    Search term
-    """
-    searchTerm: String
-
-    """
-    Filter by creation date
-    """
-    createdAfter: DateTime
-    createdBefore: DateTime
-}
-
-input FlashcardSetFilterInput {
-    """
-    Search term
-    """
-    searchTerm: String
-
-    """
-    Filter by visibility
-    """
-    isPublic: Boolean
-
-    """
-    Filter by creation date
-    """
-    createdAfter: DateTime
-    createdBefore: DateTime
-}
-
-"""
-AI generation input types
-"""
-input DocumentInput {
-    documentText: String
-    documentBase64: String
-    documentUrl: String
-}
-
-input AIGenerationOptions {
-    aiProvider: String!  # "OPENAI", "ANTHROPIC", "OLLAMA"
-    modelName: String!
-    cardCount: Int!
-    difficulty: String!  # "BEGINNER", "INTERMEDIATE", "ADVANCED"
-    language: String!
-    topic: String
-}
-
-"""
-Core domain types
-"""
-type Flashcard {
-    """
-    Unique identifier
-    """
-    id: UUID!
-
-    """
-    Unique identifier that links THIS flashcard to a FlashcardSet
-    """
-    setID: UUID!
-
-    term: String!
-
-    definition: String!
-
-    """
-    THIS Flashcard's position within the set
-    """
-    position: Int!
-
-    creationDate: DateTime!
-
-    updatedAt: DateTime
-}
-
-type FlashcardSet {
-    """
-    Unique identifier
-    """
-    id: UUID!
-
-    """
-    Unique identifier that links THIS FlashcardSet to the original User
-    """
-    author: User!
-
-    title: String
-
-    description: String
-
-    """
-    Determine whether THIS FlashcardSet is visible to the public or just to the original User
-    """
-    isPublic: Boolean!
-
-    creationDate: DateTime!
-
-    lastUpdated: DateTime
-
-    """
-    List of Flashcards within the set
-    """
-    flashcards: [Flashcard]
-}
-
-type File {
-    """
-    Unique identifier
-    """
-    id: UUID!
-
-    filename: String!
-
-    originalFilename: String!
-
-    contentType: String!
-
-    filePath: String!
-
-    md5Sum: String!
-
-    uploadedDate: DateTime!
-
-    fileSize: Int!
-
-    uploader: User!
-}
-
+# User Domain Types
+"""User account information"""
 type User {
-    """
-    Unique identifier
-    """
+    """Unique identifier for the user"""
     id: UUID!
 
+    """Unique username for authentication and identification"""
     username: String!
 
+    """User's email address"""
     email: String!
 
+    """User's first name"""
     firstName: String!
 
+    """User's last name"""
     lastName: String!
 
+    """Timestamp when the user account was created"""
     creationDate: DateTime!
 
+    """Timestamp when the user account was last updated"""
     lastUpdated: DateTime
 
+    """Collection of flashcard sets created by this user"""
     flashcardSets: [FlashcardSet]
 
+    """Collection of files uploaded by this user"""
     files: [File]
 
-    """
-    THIS User's assigned roles
-    """
+    """Collection of roles assigned to this user"""
     roles: [Role]
 }
 
-"""
-AI generation response types
-"""
-type GeneratedFlashcard {
+"""Metadata for an uploaded file"""
+type File {
+    """Unique identifier for the file"""
+    id: UUID!
+
+    """System-generated filename on the server"""
+    filename: String!
+
+    """Original filename from the user's system"""
+    originalFilename: String!
+
+    """MIME type of the file"""
+    contentType: String!
+
+    """Server path where the file is stored"""
+    filePath: String!
+
+    """MD5 checksum for file integrity verification"""
+    md5Sum: String!
+
+    """Timestamp when the file was uploaded"""
+    uploadedDate: DateTime!
+
+    """Size of the file in bytes"""
+    fileSize: Int!
+
+    """User who uploaded this file"""
+    uploader: User!
+}
+
+# Flashcard Domain Types
+"""Individual flashcard containing a term and definition pair"""
+type Flashcard {
+    """Unique identifier for the flashcard"""
+    id: UUID!
+
+    """Reference to the flashcard set this card belongs to"""
+    setID: UUID!
+
+    """The term or front side of the flashcard"""
     term: String!
+
+    """The definition or back side of the flashcard"""
     definition: String!
+
+    """Order position within the flashcard set (zero-based)"""
+    position: Int!
+
+    """Timestamp when the flashcard was created"""
+    creationDate: DateTime!
+
+    """Timestamp when the flashcard was last modified"""
+    updatedAt: DateTime
+}
+
+"""Collection of related flashcards created by a user"""
+type FlashcardSet {
+    """Unique identifier for the flashcard set"""
+    id: UUID!
+
+    """User who created this flashcard set"""
+    author: User!
+
+    """Title of the flashcard set"""
+    title: String
+
+    """Description of the flashcard set"""
+    description: String
+
+    """Whether the flashcard set is visible to all users"""
+    isPublic: Boolean!
+
+    """Timestamp when the flashcard set was created"""
+    creationDate: DateTime!
+
+    """Timestamp when the flashcard set was last modified"""
+    lastUpdated: DateTime
+
+    """Collection of flashcards contained in this set"""
+    flashcards: [Flashcard]
+}
+
+"""Flashcard generated through AI processing"""
+type GeneratedFlashcard {
+    """The term or front side of the flashcard"""
+    term: String!
+
+    """The definition or back side of the flashcard"""
+    definition: String!
+
+    """Suggested position within the flashcard set"""
     position: Int!
 }
 
-type FlashcardGenerationResult {
-    temporaryId: UUID!
-    generatedFlashcards: [GeneratedFlashcard!]!
+"""Collection of AI-generated flashcards"""
+type GeneratedFlashcardSet {
+    """Suggested title for the flashcard set"""
+    title: String
+
+    """Suggested description for the flashcard set"""
+    description: String
+
+    """Collection of AI-generated flashcards"""
+    generatedFlashcards: [GeneratedFlashcard]
 }
 
-"""
-Authorization types
-"""
+# Authorization Domain Types
+"""Role that determines a user's permissions"""
 type Role {
-    """
-    Uniquely identify every role
-    """
+    """Unique identifier for the role"""
     id: UUID!
 
+    """Name of the role (e.g., Admin, User, Moderator)"""
     name: String!
 
+    """Collection of privileges granted by this role"""
     privileges: [Privilege]
 }
 
+"""Individual permission that can be assigned to roles"""
 type Privilege {
-    """
-    Uniquely identify every privilege
-    """
+    """Unique identifier for the privilege"""
     id: UUID!
 
+    """Name of the privilege (e.g., READ_USERS, CREATE_FLASHCARDS)"""
     name: String!
 }
 
-extend type Mutation {
-    uploadProfilePicture(input: Upload!): ImageUploadResult!
-    uploadDocument(input: Upload!): DocumentUploadResult!
-    deleteDocument(id: UUID!): UUID!
+# Input Types
+"""Input for user registration"""
+input UserRegInput {
+    """Desired username (must be unique)"""
+    username: String!
 
-    deleteCurrentUserProfilePicture: Boolean!
-    deleteUserProfilePicture(id: UUID!): Boolean!
+    """User's email address (must be unique)"""
+    email: String!
+
+    """User's first name"""
+    firstName: String!
+
+    """User's last name"""
+    lastName: String!
+
+    """User's password (will be securely hashed)"""
+    password: String!
 }
 
-"""
-Mutations for performing CRUD operations and other actions
-"""
-type Mutation {
-    """
-    Authentication Mutations
-    """
-    register(input: UserRegInput!): User!
-    registerAdmin(input: UserRegInput!, secret: String!): User!
-    login(username: String!, password: String!): User!
+"""Input for creating or updating a flashcard"""
+input FlashcardInput {
+    """The term or front side of the flashcard"""
+    term: String!
 
-    # TODO
-    """
-    AI Generation Mutations
-    """
-    generateFlashcards(document: DocumentInput!, options: AIGenerationOptions!): FlashcardGenerationResult!
-    saveGeneratedFlashcards(
-        temporaryId: UUID!,
-        title: String!,
-        description: String,
-        isPublic: Boolean!,
-        flashcards: [FlashcardInput!]!
-    ): FlashcardSet!
+    """The term or back side of the flashcard"""
+    definition: String!
 
-    """
-    Flashcard and FlashcardSet Mutations
-    """
-    createFlashcardSet(flashcardSetInput: FlashcardSetInput!): FlashcardSet!
-    updateFlashcardSet(id: UUID!, flashcardSetInput: FlashcardSetInput): FlashcardSet!
-    deleteFlashcardSet(userId: UUID!, setId: UUID!): String!
-
-    """
-    User Mutations
-    """
-    updateUser(id: UUID!, username: String, email: String, firstName: String, lastName: String): User!
-    deleteUser(id: UUID!): UUID!
-
-    """
-    Role and Privilege Mutations
-    """
-    createRole(name: String!): Role!
-    updateRole(id: UUID, name: String): Role!
-    deleteRole(id: UUID!): UUID!
-
-    """
-    Role and User Assignment Mutations
-    """
-    assignRoleToUser(userId: UUID!, roleId: UUID!): User!
-    removeRoleFromUser(userId: UUID!, roleId: UUID!): User!
-    assignPrivilegeToRole(roleId: UUID!, privilegeId: UUID!): Role!
-    removePrivilegeFromRole(roleId: UUID!, privilegeId: UUID!): Role!
+    """Order position within the flashcard set (zero-based)"""
+    position: Int!
 }
 
-"""
-Queries for retrieving data
-"""
+"""Input for creating or updating a flashcard set"""
+input FlashcardSetInput {
+    """Title of the flashcard set"""
+    title: String
+
+    """Description of the flashcard set"""
+    description: String
+
+    """Whether the flashcard set should be visible to all users"""
+    isPublic: Boolean!
+
+    """Collection of flashcards to include in this set"""
+    flashcards: [FlashcardInput]!
+}
+
+"""Options for AI-powered flashcard generation"""
+input FlashcardGenOptions {
+    """Number of flashcards to generate"""
+    kQuestions: Int!
+
+    """Topic or content to generate flashcards from"""
+    query: String!
+}
+
+"""Filtering options for flashcard set queries"""
+input FlashcardSetFilterInput {
+    """Text to search in title and description fields"""
+    searchTerm: String
+
+    """Filter by public/private status"""
+    isPublic: Boolean
+
+    """Filter sets created after this timestamp"""
+    createdAfter: DateTime
+
+    """Filter sets created before this timestamp"""
+    createdBefore: DateTime
+}
+
+# Operations
 type Query {
-    """
-    User Queries
-    """
+    # User Queries
+    """Returns the currently authenticated user"""
     me: User
+
+    """Find a user by their UUID"""
     findUserById(id: UUID): User
+
+    """Find a user by their username"""
     findUserByUsername(username: String!): User
+
+    """Find a user by their email address"""
     findUserByEmail(email: String!): User
+
+    """Returns a paginated list of all users"""
     findAllUsers(page: Int!, size: Int!): PaginatedUser
 
-    """
-    FlashcardSet Queries
-    """
+    # Flashcard Queries
+    """Find a flashcard set by its UUID"""
     findFlashcardSetById(id: UUID!): FlashcardSet
-    findFlashcardSetByAuthorId(id: UUID!, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
-    findPublicFlashcardSets(filter: FlashcardSetFilterInput, page: Int = 0, size: Int = 10): PaginatedFlashcardSet
 
-    """
-    Role and Privilege Queries
-    """
+    """Find flashcard sets created by a specific user"""
+    findFlashcardSetByAuthorId(
+        """UUID of the author"""
+        id: UUID!,
+        """Page number (zero-based)"""
+        page: Int = 0,
+        """Number of items per page"""
+        size: Int = 10
+    ): PaginatedFlashcardSet
+
+    """Find publicly accessible flashcard sets based on filters"""
+    findPublicFlashcardSets(
+        """Filtering criteria"""
+        filter: FlashcardSetFilterInput,
+        """Page number (zero-based)"""
+        page: Int = 0,
+        """Number of items per page"""
+        size: Int = 10
+    ): PaginatedFlashcardSet
+
+    # Role Queries
+    """Find a role by its UUID"""
     findRoleById(id: UUID!): Role
+
+    """Find a role by its name"""
     findRoleByName(name: String!): Role
-    roles(page: Int = 0, size: Int = 10): PaginatedRole
+
+    """Returns a paginated list of all roles"""
+    roles(
+        """Page number (zero-based)"""
+        page: Int = 0,
+        """Number of items per page"""
+        size: Int = 10
+    ): PaginatedRole
+
+    """Returns a list of all available privileges"""
     privileges: [Privilege!]!
 }
 
+type Mutation {
+    # User Mutations
+    """Register a new standard user account"""
+    register(input: UserRegInput!): User!
+
+    """Register a new admin user account (requires administrator secret)"""
+    registerAdmin(
+        """User registration details"""
+        input: UserRegInput!,
+        """Administrator secret key for authorization"""
+        secret: String!
+    ): User!
+
+    """Authenticate a user and establish a session"""
+    login(
+        """Username for authentication"""
+        username: String!,
+        """User's password"""
+        password: String!
+    ): User!
+
+    """Update a user's profile information"""
+    updateUser(
+        """UUID of the user to update"""
+        id: UUID!,
+        """New username (optional)"""
+        username: String,
+        """New email address (optional)"""
+        email: String,
+        """New first name (optional)"""
+        firstName: String,
+        """New last name (optional)"""
+        lastName: String
+    ): User!
+
+    """Delete a user account"""
+    deleteUser(
+        """UUID of the user to delete"""
+        id: UUID!
+    ): UUID!
+
+    # Flashcard Mutations
+    """Generate a flashcard set using AI based on a topic"""
+    generateFlashcardSet(
+        """Configuration options for flashcard generation"""
+        options: FlashcardGenOptions!
+    ): GeneratedFlashcardSet
+
+    """Create a new flashcard set"""
+    createFlashcardSet(
+        """Details of the flashcard set to create"""
+        flashcardSetInput: FlashcardSetInput!
+    ): FlashcardSet!
+
+    """Update an existing flashcard set"""
+    updateFlashcardSet(
+        """UUID of the flashcard set to update"""
+        id: UUID!,
+        """New details for the flashcard set"""
+        flashcardSetInput: FlashcardSetInput
+    ): FlashcardSet!
+
+    """Delete a flashcard set"""
+    deleteFlashcardSet(
+        """UUID of the user who owns the set"""
+        userId: UUID!,
+        """UUID of the flashcard set to delete"""
+        setId: UUID!
+    ): String!
+
+    # Role Mutations
+    """Create a new role"""
+    createRole(
+        """Name of the role to create"""
+        name: String!
+    ): Role!
+
+    """Update an existing role"""
+    updateRole(
+        """UUID of the role to update"""
+        id: UUID,
+        """New name for the role"""
+        name: String
+    ): Role!
+
+    """Delete a role"""
+    deleteRole(
+        """UUID of the role to delete"""
+        id: UUID!
+    ): UUID!
+
+    """Assign a role to a user"""
+    assignRoleToUser(
+        """UUID of the user"""
+        userId: UUID!,
+        """UUID of the role to assign"""
+        roleId: UUID!
+    ): User!
+
+    """Remove a role from a user"""
+    removeRoleFromUser(
+        """UUID of the user"""
+        userId: UUID!,
+        """UUID of the role to remove"""
+        roleId: UUID!
+    ): User!
+
+    """Add a privilege to a role"""
+    assignPrivilegeToRole(
+        """UUID of the role"""
+        roleId: UUID!,
+        """UUID of the privilege to assign"""
+        privilegeId: UUID!
+    ): Role!
+
+    """Remove a privilege from a role"""
+    removePrivilegeFromRole(
+        """UUID of the role"""
+        roleId: UUID!,
+        """UUID of the privilege to remove"""
+        privilegeId: UUID!
+    ): Role!
+
+    # File Upload Mutations
+    """Upload a profile picture for the current user"""
+    uploadProfilePicture(
+        """File to upload"""
+        input: Upload!
+    ): ImageUploadResult!
+
+    """Upload a document file"""
+    uploadDocument(
+        """File to upload"""
+        input: Upload!
+    ): DocumentUploadResult!
+
+    """Delete a document by its UUID"""
+    deleteDocument(
+        """UUID of the document to delete"""
+        id: UUID!
+    ): UUID!
+
+    """Delete the current authenticated user's profile picture"""
+    deleteCurrentUserProfilePicture: Boolean!
+
+    """Delete a specific user's profile picture (admin only)"""
+    deleteUserProfilePicture(
+        """UUID of the user whose profile picture should be deleted"""
+        id: UUID!
+    ): Boolean!
+}
+
 type Subscription {
-    flashcardSetChat(conversationId: UUID!, setId: UUID!, message: String!): String
+    """
+    Subscribe to an AI chat agent interaction about a flashcard set.
+    Users must generate and maintain their own conversationId to track the chat session.
+    Returns AI-generated responses to user messages about the flashcard set.
+    """
+    flashcardSetChat(
+        """UUID of the conversation thread (user-generated and tracked)"""
+        conversationId: UUID!,
+        """UUID of the relevant flashcard set being discussed"""
+        setId: UUID!,
+        """Message content to send to the AI chat agent"""
+        message: String!
+    ): String
 }
