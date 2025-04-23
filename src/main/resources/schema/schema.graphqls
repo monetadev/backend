@@ -348,6 +348,16 @@ type Query {
         size: Int = 10
     ): PaginatedFlashcardSet
 
+    """Find publicly accessible flashcard sets based on filters and search query"""
+    searchPublicFlashcards(
+        """Filtering criteria"""
+        filter: FlashcardSetFilterInput,
+        """Page number (zero-based)"""
+        page: Int = 0,
+        """Number of items per page"""
+        size: Int = 10
+    ) : PaginatedFlashcardSet
+
     """Find publicly accessible flashcard sets based on filters"""
     findPublicFlashcardSets(
         """Filtering criteria"""
