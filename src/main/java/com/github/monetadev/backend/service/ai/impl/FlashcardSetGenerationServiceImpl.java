@@ -1,7 +1,7 @@
 package com.github.monetadev.backend.service.ai.impl;
 
-import com.github.monetadev.backend.graphql.type.FlashcardGenOptions;
-import com.github.monetadev.backend.graphql.type.GeneratedFlashcardSet;
+import com.github.monetadev.backend.graphql.type.ai.FlashcardGenOptions;
+import com.github.monetadev.backend.graphql.type.ai.GeneratedFlashcardSet;
 import com.github.monetadev.backend.service.ai.FlashcardSetGenerationService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
