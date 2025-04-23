@@ -48,6 +48,15 @@ type PaginatedRole {
     pageInfo: PageInfo!
 }
 
+"""Paginated collection of UserLogin objects"""
+type PaginatedUserLogin {
+    """UserLogin items on the current page"""
+    items: [UserLogin!]!
+
+    """Pagination metadata"""
+    pageInfo: PageInfo!
+}
+
 """Result of an image upload operation"""
 type ImageUploadResult {
     """System-generated filename on the server"""
@@ -198,6 +207,18 @@ type FlashcardSet {
 
     """Collection of flashcards contained in this set"""
     flashcards: [Flashcard]
+}
+
+"""User login record, automatically created upon (re-)authentication"""
+type UserLogin {
+    """Unique identifier for the successful (re-)authentication"""
+    id: UUID!,
+
+    """User successfully (re-)authenticated"""
+    user: User!,
+
+    """Timestamp generated when successfully (re-)authenticated"""
+    loginDateTime: DateTime!
 }
 
 """Flashcard generated through AI processing"""
@@ -387,6 +408,31 @@ type Query {
 
     """Returns a list of all available privileges"""
     privileges: [Privilege!]!
+
+    # UserLogin Queries
+    """Returns a paginated list of login records for the currently authenticated user"""
+    myLoginHistory(
+        """Page number (zero-based)"""
+        page: Int = 0,
+        """Number of items per page"""
+        size: Int = 10
+    ) : PaginatedUserLogin!
+
+    """Returns a paginated list of login records for the currently authenticated user within a specified date range"""
+    myLoginHistoryBetweenDates(
+        """Start date/time (inclusive)"""
+        start: DateTime!,
+        """End date/time (inclusive)"""
+        end: DateTime!,
+        """Page number (zero-based)"""
+        page: Int = 0,
+        """Number of items per page"""
+        size: Int = 10
+    ): PaginatedUserLogin!
+
+    """Returns the current authenticated user's login streak (consecutive 24-hour periods with at least one login)"""
+    myLoginStreak: Int!
+
 }
 
 type Mutation {
