@@ -57,14 +57,6 @@ public class DocumentUploadService implements FileTypeService {
      * {@inheritDoc}
      */
     @Override
-    public long getMaxFileSize() {
-        return fileProperties.getDocumentMaxSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new InvalidFileUploadException("Document file is empty");
@@ -74,12 +66,6 @@ public class DocumentUploadService implements FileTypeService {
         if (contentType == null || !getAllowedMimeTypes().contains(contentType)) {
             throw new InvalidFileUploadException(
                     "Invalid document type. Allowed types: " + String.join(", ", getAllowedMimeTypes())
-            );
-        }
-
-        if (file.getSize() > getMaxFileSize()) {
-            throw new InvalidFileUploadException(
-                    "Document exceeds maximum size of " + (getMaxFileSize() / (1024 * 1024)) + "MB"
             );
         }
     }

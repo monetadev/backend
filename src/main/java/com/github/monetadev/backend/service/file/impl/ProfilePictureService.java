@@ -64,14 +64,6 @@ public class ProfilePictureService implements FileTypeService {
      * {@inheritDoc}
      */
     @Override
-    public long getMaxFileSize() {
-        return fileProperties.getProfilePictureMaxSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new InvalidFileUploadException("Image file is empty");
@@ -81,12 +73,6 @@ public class ProfilePictureService implements FileTypeService {
         if (contentType == null || !getAllowedMimeTypes().contains(contentType)) {
             throw new InvalidFileUploadException(
                     "Invalid image type. Allowed types: " + String.join(", ", getAllowedMimeTypes())
-            );
-        }
-
-        if (file.getSize() > getMaxFileSize()) {
-            throw new InvalidFileUploadException(
-                    "Image exceeds maximum size of " + (getMaxFileSize() / (1024 * 1024)) + "MB"
             );
         }
     }
