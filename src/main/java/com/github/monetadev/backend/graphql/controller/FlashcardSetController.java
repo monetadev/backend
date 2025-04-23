@@ -44,7 +44,7 @@ public class FlashcardSetController {
     }
 
     @DgsQuery
-    public PaginatedFlashcardSet searchFlashcardSets(@InputArgument FlashcardSetFilterInput filter,
+    public PaginatedFlashcardSet searchPublicFlashcardSets(@InputArgument FlashcardSetFilterInput filter,
                                                      @InputArgument String query,
                                                      @InputArgument Integer page,
                                                      @InputArgument Integer size) {

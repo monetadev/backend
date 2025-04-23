@@ -349,9 +349,11 @@ type Query {
     ): PaginatedFlashcardSet
 
     """Find publicly accessible flashcard sets based on filters and search query"""
-    searchPublicFlashcards(
+    searchPublicFlashcardSets(
         """Filtering criteria"""
         filter: FlashcardSetFilterInput,
+        """User query to compare against both title and description."""
+        query: String!,
         """Page number (zero-based)"""
         page: Int = 0,
         """Number of items per page"""
