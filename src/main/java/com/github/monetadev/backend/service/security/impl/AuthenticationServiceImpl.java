@@ -4,9 +4,10 @@ import com.github.monetadev.backend.exception.AdminProvisioningDisabledException
 import com.github.monetadev.backend.exception.InvalidAdminSecretException;
 import com.github.monetadev.backend.exception.RoleNotFoundException;
 import com.github.monetadev.backend.exception.UserNotAuthenticatedException;
-import com.github.monetadev.backend.graphql.type.UserRegInput;
+import com.github.monetadev.backend.graphql.type.input.UserRegInput;
 import com.github.monetadev.backend.model.Role;
 import com.github.monetadev.backend.model.User;
+import com.github.monetadev.backend.model.UserLogin;
 import com.github.monetadev.backend.repository.RoleRepository;
 import com.github.monetadev.backend.repository.UserRepository;
 import com.github.monetadev.backend.security.jwt.JwtUserDetails;
@@ -135,7 +136,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!passwordEncoder.matches(password, user.get().getPassword())) {
             throw new IllegalArgumentException("Invalid username or password");
         }
-        return user.get();
+
+        // Add user login.
+        User authenticatedUser = user.get();
+        UserLogin userLogin = new UserLogin();
+        userLogin.setUser(authenticatedUser);
+        authenticatedUser.getUserLogins().add(userLogin);
+        return authenticatedUser;
     }
 
     /**

@@ -9,9 +9,11 @@ import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
+import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
+import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +22,11 @@ import java.util.UUID;
 
 @Service
 public class DocumentEmbedServiceImpl implements DocumentEmbedService {
-    private final QdrantVectorStore vectorStore;
+    private final VectorStore vectorStore;
     private final FileService fileService;
     private final AuthenticationService authenticationService;
 
-    public DocumentEmbedServiceImpl(QdrantVectorStore vectorStore, FileService fileService, AuthenticationService authenticationService) {
+    public DocumentEmbedServiceImpl(PgVectorStore vectorStore, FileService fileService, AuthenticationService authenticationService) {
         this.vectorStore = vectorStore;
         this.fileService = fileService;
         this.authenticationService = authenticationService;
@@ -36,13 +38,6 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
     @Override
     public String embedFile(File file) {
         Resource resource = fileService.getResourceByFile(file);
-        if (file.getContentType().equals("application/pdf")) {
-            try {
-                return embedFileByDocumentReader(file, resource, DocumentType.STRUCTURED_PDF);
-            } catch (Exception ignored) {
-                return embedFileByDocumentReader(file, resource, DocumentType.PDF);
-            }
-        }
         return embedFileByDocumentReader(file, resource, DocumentType.OTHER);
     }
 
@@ -53,7 +48,7 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
     public void deleteEmbeddingById(UUID id) {
         Filter.Expression expression = new Filter.Expression(
                 Filter.ExpressionType.EQ,
-                new Filter.Key("docId"),
+                new Filter.Key("id"),
                 new Filter.Value(id.toString())
         );
         vectorStore.delete(expression);
@@ -77,12 +72,13 @@ public class DocumentEmbedServiceImpl implements DocumentEmbedService {
             }
         };
         documents.forEach(document -> {
-            document.getMetadata().put("docId", file.getId().toString());
+            document.getMetadata().put("id", file.getId().toString());
             document.getMetadata().put("originalFilename", file.getOriginalFilename());
             document.getMetadata().put("filename", file.getFilename());
             document.getMetadata().put("userId", authenticationService.getAuthenticatedUser().getId().toString());
         });
-        vectorStore.accept(new TokenTextSplitter().apply(documents));
+        TextSplitter splitter = new TokenTextSplitter();
+        vectorStore.accept(splitter.split(documents));
         return file.getOriginalFilename();
     }
 

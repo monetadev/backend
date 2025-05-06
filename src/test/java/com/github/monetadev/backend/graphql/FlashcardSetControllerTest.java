@@ -1,6 +1,6 @@
 package com.github.monetadev.backend.graphql;
 
-import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.FlashcardSet;
 import com.github.monetadev.backend.security.jwt.JwtUserDetails;

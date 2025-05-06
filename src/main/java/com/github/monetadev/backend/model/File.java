@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -37,7 +37,7 @@ public class File {
 
     @CreationTimestamp
     @Column(name = "uploaded_date")
-    private LocalDateTime uploadedDate;
+    private OffsetDateTime uploadedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

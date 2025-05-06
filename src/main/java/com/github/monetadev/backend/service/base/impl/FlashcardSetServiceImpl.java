@@ -1,8 +1,8 @@
 package com.github.monetadev.backend.service.base.impl;
 
 import com.github.monetadev.backend.exception.FlashcardSetNotFoundException;
-import com.github.monetadev.backend.graphql.type.FlashcardInput;
-import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.Flashcard;
 import com.github.monetadev.backend.model.FlashcardSet;
@@ -57,7 +57,22 @@ public class FlashcardSetServiceImpl implements FlashcardSetService {
      */
     @Override
     public PaginatedFlashcardSet findPublicFlashcardSets(int page, int size) {
-        Page<FlashcardSet> flashcardSets = flashcardSetRepository.findAllByIsPublic(true, PageRequest.of(page, size));
+        Page<FlashcardSet> flashcardSets = flashcardSetRepository.findAllByIsPublicOrderByCreationDateDesc(true, PageRequest.of(page, size));
+
+        return PaginatedFlashcardSet.of()
+                .items(flashcardSets.getContent())
+                .totalPages(flashcardSets.getTotalPages())
+                .totalElements(flashcardSets.getTotalElements())
+                .currentPage(flashcardSets.getNumber())
+                .build();
+    }
+
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    public PaginatedFlashcardSet findFlashcardSetsByLikeTitleOrDescription(String query, int page, int size) {
+        Page<FlashcardSet> flashcardSets = flashcardSetRepository.findAllByIsPublicIsTrueAndTitleContainsIgnoreCaseOrDescriptionContainsIgnoreCase(query, query, PageRequest.of(page, size));
 
         return PaginatedFlashcardSet.of()
                 .items(flashcardSets.getContent())
@@ -93,15 +108,17 @@ public class FlashcardSetServiceImpl implements FlashcardSetService {
         flashcardSet.setDescription(flashcardSetInput.getDescription());
         flashcardSet.setIsPublic(flashcardSetInput.getIsPublic());
 
-        Map<Integer, Flashcard> existingFlashcardsByPosition = new HashMap<>();
-        if (flashcardSet.getFlashcards() != null) {
-            for (Flashcard flashcard : flashcardSet.getFlashcards()) {
-                existingFlashcardsByPosition.put(flashcard.getPosition(), flashcard);
-            }
+        if (flashcardSet.getFlashcards() == null) {
+            flashcardSet.setFlashcards(new ArrayList<>());
         }
-
-        List<Flashcard> updatedFlashcards = new ArrayList<>();
-
+        
+        Map<Integer, Flashcard> existingFlashcardsByPosition = new HashMap<>();
+        for (Flashcard flashcard : flashcardSet.getFlashcards()) {
+            existingFlashcardsByPosition.put(flashcard.getPosition(), flashcard);
+        }
+        
+        Set<Flashcard> flashcardsToKeep = new HashSet<>();
+        
         if (flashcardSetInput.getFlashcards() != null && !flashcardSetInput.getFlashcards().isEmpty()) {
             List<FlashcardInput> sortedInputs = new ArrayList<>(flashcardSetInput.getFlashcards());
             sortedInputs.sort(Comparator.comparing(FlashcardInput::getPosition));
@@ -116,15 +133,18 @@ public class FlashcardSetServiceImpl implements FlashcardSetService {
                 } else {
                     flashcard = new Flashcard();
                     flashcard.setFlashcardSet(flashcardSet);
+                    flashcardSet.getFlashcards().add(flashcard);
                 }
+                
                 flashcard.setTerm(input.getTerm());
                 flashcard.setDefinition(input.getDefinition());
                 flashcard.setPosition(normalizedPosition);
-                updatedFlashcards.add(flashcard);
+                
+                flashcardsToKeep.add(flashcard);
             }
         }
 
-        flashcardSet.setFlashcards(updatedFlashcards);
+        flashcardSet.getFlashcards().removeIf(flashcard -> !flashcardsToKeep.contains(flashcard));
         return flashcardSetRepository.save(flashcardSet);
     }
 
@@ -133,11 +153,10 @@ public class FlashcardSetServiceImpl implements FlashcardSetService {
      */
     @Override
     public String deleteFlashcardSet(UUID id) throws FlashcardSetNotFoundException {
-        if (!flashcardSetRepository.existsById(id)) {
-            throw new FlashcardSetNotFoundException("Cannot delete non-existent flashcard set with ID: " + id);
-        }
-        String title = flashcardSetRepository.findById(id).get().getTitle();
-        flashcardSetRepository.deleteById(id);
+        FlashcardSet flashcardSet = flashcardSetRepository.findById(id)
+                .orElseThrow(() -> new FlashcardSetNotFoundException("Cannot delete non-existent flashcard set with ID: " + id));
+        String title = flashcardSet.getTitle();
+        flashcardSetRepository.delete(flashcardSet);
         return title;
     }
 }

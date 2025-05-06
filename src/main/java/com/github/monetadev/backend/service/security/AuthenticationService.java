@@ -1,6 +1,6 @@
 package com.github.monetadev.backend.service.security;
 
-import com.github.monetadev.backend.graphql.type.UserRegInput;
+import com.github.monetadev.backend.graphql.type.input.UserRegInput;
 import com.github.monetadev.backend.model.User;
 
 public interface AuthenticationService {

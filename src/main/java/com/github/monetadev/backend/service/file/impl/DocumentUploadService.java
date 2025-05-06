@@ -1,6 +1,7 @@
 package com.github.monetadev.backend.service.file.impl;
 
 import com.github.monetadev.backend.config.prop.FileProperties;
+import com.github.monetadev.backend.exception.DocumentDeleteException;
 import com.github.monetadev.backend.exception.DocumentUploadException;
 import com.github.monetadev.backend.exception.InvalidFileUploadException;
 import com.github.monetadev.backend.graphql.type.file.DocumentUploadResult;
@@ -119,15 +120,12 @@ public class DocumentUploadService implements FileTypeService {
     }
 
     @Transactional
-    public boolean deleteUserDocument(UUID documentId) {
-        if (documentId == null) {
-            return false;
-        }
-
+    public UUID deleteUserDocument(UUID documentId) {
         User user = authenticationService.getAuthenticatedUser();
-        Optional<File> document = fileRepository.findByIdAndUser(documentId, user);
+        File document = fileRepository.findByIdAndUser(documentId, user)
+                .orElseThrow(() -> new DocumentDeleteException("Document not found with id: " + documentId));
 
-        return document.map(this::deleteDocument).orElse(false);
+        return deleteDocument(document) ? documentId : null;
     }
 
     @Transactional

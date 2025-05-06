@@ -71,4 +71,12 @@ public class User {
             orphanRemoval = true
     )
     private Set<FlashcardSet> flashcardSets;
+
+    @OneToMany(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<UserLogin> userLogins;
 }

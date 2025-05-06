@@ -1,4 +1,4 @@
-package com.github.monetadev.backend.graphql.type;
+package com.github.monetadev.backend.graphql.type.ai.set;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.github.monetadev.backend.graphql.controller;
 
-import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.filters.FlashcardSetFilterInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.FlashcardSet;
@@ -29,15 +29,6 @@ public class FlashcardSetController {
         return flashcardSetService.findFlashcardSetById(id);
     }
 
-    /*
-    @DgsQuery
-    public PaginatedFlashcard findFlashcardsBySetId(@InputArgument UUID id,
-                                                    @InputArgument FlashcardFilterInput filter,
-                                                    @InputArgument Integer page,
-                                                    @InputArgument Integer size) {
-        return flashcardService.findFlashcardsBySetId(id, page, size);
-    }*/
-
     @DgsQuery
     public PaginatedFlashcardSet findFlashcardSetByAuthorId(@InputArgument UUID id,
                                                             @InputArgument Integer page,
@@ -50,6 +41,14 @@ public class FlashcardSetController {
                                                          @InputArgument Integer page,
                                                          @InputArgument Integer size) {
         return flashcardSetService.findPublicFlashcardSets(page, size);
+    }
+
+    @DgsQuery
+    public PaginatedFlashcardSet searchPublicFlashcardSets(@InputArgument FlashcardSetFilterInput filter,
+                                                     @InputArgument String query,
+                                                     @InputArgument Integer page,
+                                                     @InputArgument Integer size) {
+        return flashcardSetService.findFlashcardSetsByLikeTitleOrDescription(query, page, size);
     }
 
     @DgsMutation

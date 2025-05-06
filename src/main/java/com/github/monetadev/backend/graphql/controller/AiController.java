@@ -1,7 +1,7 @@
 package com.github.monetadev.backend.graphql.controller;
 
-import com.github.monetadev.backend.graphql.type.FlashcardGenOptions;
-import com.github.monetadev.backend.graphql.type.GeneratedFlashcardSet;
+import com.github.monetadev.backend.graphql.type.ai.set.FlashcardGenOptions;
+import com.github.monetadev.backend.graphql.type.ai.set.GeneratedFlashcardSet;
 import com.github.monetadev.backend.service.ai.ChatAgentService;
 import com.github.monetadev.backend.service.ai.FlashcardSetGenerationService;
 import com.netflix.graphql.dgs.DgsComponent;

@@ -31,7 +31,7 @@ repositories {
 }
 
 extra["netflixDgsVersion"] = "10.0.3"
-extra["springAiVersion"] = "1.0.0-M7"
+extra["springAiVersion"] = "1.0.0-M8"
 
 dependencies {
     implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -49,7 +49,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-tika-document-reader")
     implementation("org.springframework.ai:spring-ai-pdf-document-reader")
     implementation("org.springframework.ai:spring-ai-starter-model-ollama")
-    implementation("org.springframework.ai:spring-ai-starter-vector-store-qdrant")
+    implementation("org.springframework.ai:spring-ai-starter-vector-store-pgvector")
     implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
     implementation("org.apache.commons:commons-text:1.13.0")
@@ -75,4 +75,9 @@ dependencyManagement {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    // Mockito
+    jvmArgs(
+        "-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }?.absolutePath}"
+    )
 }

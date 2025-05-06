@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @DgsMutation
-    @PreAuthorize("hasAuthority('USER_ADMIN') or authentication.principal.id == #id")
+    @PreAuthorize("hasAuthority('USER_ADMIN') or authentication.principal.userId == #id")
     public User updateUser(@InputArgument UUID id,
                            @InputArgument String username,
                            @InputArgument String email,

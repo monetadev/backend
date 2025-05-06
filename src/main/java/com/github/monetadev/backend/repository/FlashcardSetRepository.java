@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface FlashcardSetRepository extends JpaRepository<FlashcardSet, UUID> {
     Page<FlashcardSet> findAllByAuthorId(UUID authorId, Pageable pageable);
 
-    Page<FlashcardSet> findAllByIsPublic(Boolean isPublic, Pageable pageable);
+    Page<FlashcardSet> findAllByIsPublicOrderByCreationDateDesc(Boolean isPublic, Pageable pageable);
+
+    Page<FlashcardSet> findAllByIsPublicIsTrueAndTitleContainsIgnoreCaseOrDescriptionContainsIgnoreCase(String title, String description, Pageable pageable);
 }

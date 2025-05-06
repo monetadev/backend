@@ -1,7 +1,7 @@
 package com.github.monetadev.backend.service.base;
 
 import com.github.monetadev.backend.exception.FlashcardSetNotFoundException;
-import com.github.monetadev.backend.graphql.type.FlashcardSetInput;
+import com.github.monetadev.backend.graphql.type.input.FlashcardSetInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedFlashcardSet;
 import com.github.monetadev.backend.model.FlashcardSet;
 
@@ -29,6 +29,15 @@ public interface FlashcardSetService {
      * @return A {@link List} of {@link FlashcardSet}, empty if none found.
      */
     PaginatedFlashcardSet findPublicFlashcardSets(int page, int size);
+
+    /**
+     * Retrieves all {@link FlashcardSet} objects that match the given title and description.
+     * @param query The title and description to search for. Case-insensitive.
+     * @param page The page number to retrieve. Starts at 0.
+     * @param size The number of items to retrieve per page. Must be greater than 0.
+     * @return A {@link List} of {@link FlashcardSet} objects matching the given title and description, empty if none found.
+     */
+    PaginatedFlashcardSet findFlashcardSetsByLikeTitleOrDescription(String query, int page, int size);
 
     /**
      * Creates a new {@link FlashcardSet}.
