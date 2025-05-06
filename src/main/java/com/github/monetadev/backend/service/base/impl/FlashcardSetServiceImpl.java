@@ -57,7 +57,7 @@ public class FlashcardSetServiceImpl implements FlashcardSetService {
      */
     @Override
     public PaginatedFlashcardSet findPublicFlashcardSets(int page, int size) {
-        Page<FlashcardSet> flashcardSets = flashcardSetRepository.findAllByIsPublic(true, PageRequest.of(page, size));
+        Page<FlashcardSet> flashcardSets = flashcardSetRepository.findAllByIsPublicOrderByCreationDateDesc(true, PageRequest.of(page, size));
 
         return PaginatedFlashcardSet.of()
                 .items(flashcardSets.getContent())
