@@ -8,6 +8,23 @@ scalar UUID
 """Custom scalar representing a file upload, compatible with multipart form data"""
 scalar Upload
 
+# Enum Types
+"""Used to specify metadata regarding AI agent's response length in flashcard set generation"""
+enum GenerationType {
+"""Instructs the flashcard generator to keep definitions brief"""
+    BRIEF,
+"""Instructs the flashcard generator to keep definitions verbose"""
+    VERBOSE
+}
+
+"""Used to specify a question's type in a quiz, value changes data structure of resultant question/options"""
+enum QuestionType {
+    MULTIPLE_CHOICE_SINGLE_ANSWER,
+    MULTIPLE_CHOICE_MULTIPLE_ANSWER,
+    TRUE_FALSE,
+    SHORT_ANSWER
+}
+
 # Common and Pagination Types
 """Pagination metadata"""
 type PageInfo {
@@ -52,6 +69,15 @@ type PaginatedRole {
 type PaginatedUserLogin {
     """UserLogin items on the current page"""
     items: [UserLogin!]!
+
+    """Pagination metadata"""
+    pageInfo: PageInfo!
+}
+
+"""Paginated collection of Quiz objects"""
+type PaginatedQuiz {
+    """Quiz items on the current page"""
+    items: [Quiz!]!
 
     """Pagination metadata"""
     pageInfo: PageInfo!
@@ -182,6 +208,57 @@ type Flashcard {
     updatedAt: DateTime
 }
 
+# Flashcard Domain Types
+type Quiz {
+    id: UUID!
+
+    title: String!
+
+    description: String
+
+    grade: Float!
+
+    user: User!
+
+    flashcardSet: FlashcardSet!
+
+    creationDate: DateTime!
+
+    questions: [Question]
+}
+
+type Question {
+    id: UUID!
+
+    content: String!
+
+    position: Int!
+
+    type: QuestionType!
+
+    userResponse: String!
+
+    isCorrectUserResponse: Boolean!
+
+    feedback: String!
+
+    options: [Option]
+
+    quizId: UUID!
+}
+
+type Option {
+    id: UUID!
+
+    content: String!
+
+    position: Int!
+
+    isCorrect: Boolean!
+
+    questionId: UUID!
+}
+
 """Collection of related flashcards created by a user"""
 type FlashcardSet {
     """Unique identifier for the flashcard set"""
@@ -243,6 +320,64 @@ type GeneratedFlashcardSet {
 
     """Collection of AI-generated flashcards"""
     generatedFlashcards: [GeneratedFlashcard]
+}
+
+"""Quiz generated though AI processing"""
+type GeneratedQuiz {
+    """Title of the generated quiz"""
+    title: String
+
+    """Description of the generated quiz"""
+    description: String
+
+    """Questions for the generated quiz"""
+    questions: [GeneratedQuestion]
+}
+
+"""Questions generated for a quiz"""
+type GeneratedQuestion {
+    """Content of the question"""
+    content: String
+
+    """Relative location of the question in the quiz"""
+    position: Int
+
+    """Current question's type, dictates if `options` is null"""
+    type: QuestionType
+
+    """Options for the question, dependant on certain QuestionType values"""
+    options: [GeneratedOption]
+}
+
+"""Options generated for a question in a quiz"""
+type GeneratedOption {
+    """Content of the option"""
+    content: String
+
+    """Relative location of the option in the question"""
+    position: Int
+}
+
+"""Quiz graded through AI processing"""
+type GradedQuiz {
+    title: String
+    description: String
+    questions: [GradedQuestion]
+}
+
+type GradedQuestion {
+    content: String
+    position: Int
+    userResponse: String
+    isCorrectAnswer: Boolean
+    feedback: String
+    options: [GradedOption]
+}
+
+type GradedOption {
+    content: String
+    position: Int
+    isCorrect: Boolean
 }
 
 # Authorization Domain Types
@@ -313,13 +448,78 @@ input FlashcardSetInput {
     flashcards: [FlashcardInput]!
 }
 
+"""Input for creating or updating a quiz"""
+input QuizInput {
+    """Title of the quiz"""
+    title: String
+
+    """Description of the quiz"""
+    description: String
+
+    """Collection of QuestionInputs for the quiz"""
+    questions: [QuestionInput]
+
+    """Set ID associated with the quiz"""
+    setId: UUID
+}
+
+"""Input for creating questions to associate with a QuizInput"""
+input QuestionInput {
+    """Content of the question"""
+    content: String
+
+    """Position relative to other questions. 1, or lowest value, is assumed first"""
+    position: Int
+
+    """Enum representing the type of question"""
+    type: QuestionType
+
+    userResponse: String
+
+    isCorrectUserResponse: String
+
+    feedback: String
+
+    """(Optional. Dependant on the QuestionType) Options for the question"""
+    options: [OptionInput]
+}
+
+input OptionInput {
+    """Content of the option"""
+    content: String
+
+    """Position relative to other options. 1, or lowest value, is assumed first"""
+    position: Int
+
+    """Option is a/the correct option for the question"""
+    isCorrect: Boolean
+}
+
 """Options for AI-powered flashcard generation"""
 input FlashcardGenOptions {
     """Number of flashcards to generate"""
     kQuestions: Int!
 
+    """Document to add to rewrite query. If not included, use RAG on query."""
+    referenceFile: Upload
+
+    """Enum representing how the user wants their definitions to be defined, defaults to VERBOSE if null"""
+    generationType: GenerationType
+
     """Topic or content to generate flashcards from"""
     query: String!
+}
+
+"""Options for AI-powered quiz generation"""
+input QuizGenOptions {
+    """Number of questions to generate, will generate k amount per QuestionType added"""
+    kQuestions: Int!
+
+    """UUID of set to generate quiz questions from"""
+    setId: UUID!
+
+    """Types of questions to generate"""
+    questionTypes: [QuestionType!]!
 }
 
 """Filtering options for flashcard set queries"""
@@ -390,6 +590,28 @@ type Query {
         """Number of items per page"""
         size: Int = 10
     ): PaginatedFlashcardSet
+
+    getMyQuizzes(
+        page: Int = 0
+
+        size: Int = 10
+    ): PaginatedQuiz
+
+    getFlashcardSetQuizzes(
+        setId: UUID!
+
+        page: Int = 0
+
+        size: Int = 10
+    ): PaginatedQuiz
+
+    calculateSetAverageGrade(
+        setId: UUID!
+    ): Float!
+
+    calculateUserAverageGrade(
+        userId: UUID!
+    ): Float!
 
     # Role Queries
     """Find a role by its UUID"""
@@ -503,6 +725,27 @@ type Mutation {
         userId: UUID!,
         """UUID of the flashcard set to delete"""
         setId: UUID!
+    ): String!
+
+    # Quiz Mutations
+    """Generates a quiz using AI based on a flashcard set"""
+    generateQuiz(
+        """Configuration options for quiz generation"""
+        options: QuizGenOptions!
+    ): GeneratedQuiz!
+
+    gradeQuiz(
+        quiz: QuizInput!
+    ): GradedQuiz!
+
+    persistQuiz(
+        gradedQuiz: QuizInput!
+    ): Quiz!
+
+    deleteQuiz(
+        userId: UUID!
+
+        quizId: UUID!
     ): String!
 
     # Role Mutations
