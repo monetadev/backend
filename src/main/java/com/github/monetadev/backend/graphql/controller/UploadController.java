@@ -50,6 +50,6 @@ public class UploadController {
 
     @DgsMutation
     public UUID deleteDocument(@InputArgument UUID id) {
-        return fileService.deleteFile(id);
+        return documentUploadService.deleteUserDocument(id);
     }
 }

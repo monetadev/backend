@@ -1,9 +1,0 @@
-package com.github.monetadev.backend.graphql.type.ai;
-
-import lombok.Data;
-
-@Data
-public class FlashcardGenOptions {
-    String query;
-    int kQuestions;
-}

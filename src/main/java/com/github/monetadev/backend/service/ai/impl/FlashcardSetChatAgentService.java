@@ -45,10 +45,10 @@ public class FlashcardSetChatAgentService implements ChatAgentService {
                                         ChatMemory chatMemory,
                                         AuthenticationService authenticationService,
                                         FlashcardSetService flashcardSetService,
-                                        @Value("classpath:ai/flashcard-set-agent/system.st") Resource systemPrompt,
-                                        @Value("classpath:ai/flashcard-set-agent/flashcard.st") Resource flashcardPrompt,
-                                        @Value("classpath:ai/flashcard-set-agent/metadata.st") Resource metadataPrompt,
-                                        @Value("classpath:ai/flashcard-set-agent/user.st") Resource userPrompt) {
+                                        @Value("classpath:ai/set/agent/system.st") Resource systemPrompt,
+                                        @Value("classpath:ai/set/agent/flashcard.st") Resource flashcardPrompt,
+                                        @Value("classpath:ai/set/agent/metadata.st") Resource metadataPrompt,
+                                        @Value("classpath:ai/set/agent/user.st") Resource userPrompt) {
         this.chatMemory = chatMemory;
         this.authenticationService = authenticationService;
         this.flashcardSetService = flashcardSetService;

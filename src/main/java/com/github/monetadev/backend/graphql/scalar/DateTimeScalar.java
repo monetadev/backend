@@ -5,10 +5,9 @@ import com.netflix.graphql.dgs.DgsRuntimeWiring;
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.idl.RuntimeWiring;
 
-import java.time.LocalDateTime;
 
 /**
- * Utilizes {@link ExtendedScalars} implementation to map {@link LocalDateTime} objects.
+ * Utilizes {@link ExtendedScalars} implementation to map {@link java.time.OffsetDateTime} objects.
  * @author MonetaDev
  */
 @DgsComponent
