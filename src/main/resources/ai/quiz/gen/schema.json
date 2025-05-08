@@ -1,0 +1,86 @@
+{
+  "type": "object",
+  "title": "GeneratedQuiz",
+  "description": "Schema for a generated quiz, including its title, description, and a list of questions. This structure is designed for generating quizzes where all question types, including TRUE/FALSE and SHORT_ANSWER, will have their answers or choices represented within the 'options' array.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The main title of the generated quiz. This should be a concise and informative name for the quiz, suitable for display as a heading or identifier for the quiz session."
+    },
+    "description": {
+      "type": "string",
+      "description": "A more detailed description of the generated quiz. This can provide context, instructions for the quiz taker, summarize the quiz's content, or state its learning objectives."
+    },
+    "questions": {
+      "type": "array",
+      "description": "A list of question objects that constitute the quiz. Each element in this array represents a single question with its own content, type, and a non-null 'options' array structured according to the question type. The order of questions in this array defines their presentation order.",
+      "items": {
+        "type": "object",
+        "title": "GeneratedQuestion",
+        "description": "Schema for a single question within the quiz. It defines the question's text, its type, its order, and a mandatory 'options' array that contains choices or the answer itself depending on the question type.",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The textual content of the question itself. This is the primary prompt or query that the user needs to read and respond to. It should be clear and unambiguous."
+          },
+          "position": {
+            "type": "integer",
+            "description": "The sequential position or order of this question within the quiz (e.g., 1 for the first question, 2 for the second, and so on). This helps in ordering questions for display and for referencing specific questions."
+          },
+          "questionType": {
+            "type": "string",
+            "description": "Defines the type of the question, which dictates the structure and interpretation of its 'options' array. This is based on the QuestionType enum and is critical for rendering and evaluating the question correctly.",
+            "enum": [
+              "MULTIPLE_CHOICE_SINGLE_ANSWER",
+              "MULTIPLE_CHOICE_MULTIPLE_ANSWER",
+              "TRUE_FALSE",
+              "SHORT_ANSWER"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "description": "A list of options or answers for the question. This field MUST always be a non-null array and will be populated differently based on the `questionType`:\n- For `MULTIPLE_CHOICE_SINGLE_ANSWER` and `MULTIPLE_CHOICE_MULTIPLE_ANSWER`: Contains multiple `GeneratedOption` objects representing the choices. The `isCorrect` flag within each option indicates correctness.\n- For `TRUE_FALSE`: Contains a single `GeneratedOption`. The `content` of this option MUST be the string \"True\". The `isCorrect` field of this option will be `true` if the statement/question is true, and `false` if the statement/question is false. The `position` field for this option should be 1.\n- For `SHORT_ANSWER`: Contains a single `GeneratedOption`. The `content` of this option MUST be a reasonably verbose and correct textual answer to the short answer question. The `isCorrect` field for this option MUST be `true`. The `position` field for this option should be 1.\nFor all types, each item in the array must conform to the `GeneratedOption` schema.",
+            "items": {
+              "type": "object",
+              "title": "GeneratedOption",
+              "description": "Schema for a single item within the 'options' array. For multiple-choice questions, it's an answer choice. For TRUE/FALSE or SHORT_ANSWER questions, it's a structured representation of the answer itself.",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "The textual content of this option. For multiple-choice, it's the choice text. For TRUE/FALSE, it's the string \"True\". For SHORT_ANSWER, it's the correct verbose answer."
+                },
+                "position": {
+                  "type": "integer",
+                  "description": "The sequential position or identifier of this option. For multiple-choice questions with several options, this would be 1, 2, 3, etc. For TRUE/FALSE and SHORT_ANSWER types where 'options' contains a single entry representing the answer, this should be 1."
+                },
+                "isCorrect": {
+                  "type": "boolean",
+                  "description": "A boolean flag indicating correctness. For `MULTIPLE_CHOICE_SINGLE_ANSWER`, exactly one option has this as true. For `MULTIPLE_CHOICE_MULTIPLE_ANSWER`, one or more options can be true. For `TRUE_FALSE`, this reflects the truthfulness of the statement (true if the statement is true, false otherwise), where the option content is \"True\". For `SHORT_ANSWER`, this must be `true` as the option content is the correct answer."
+                }
+              },
+              "required": [
+                "content",
+                "position",
+                "isCorrect"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "content",
+          "position",
+          "questionType",
+          "options"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "questions"
+  ],
+  "additionalProperties": false
+}

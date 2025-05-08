@@ -8,22 +8,22 @@ import java.util.List;
 
 public interface FileTypeService {
     /**
-     * Get the directory name for this file type
+     * Get the directory name for this file questionType
      */
     String getDirectoryName();
 
     /**
-     * Get allowed MIME types for this file type
+     * Get allowed MIME types for this file questionType
      */
     List<String> getAllowedMimeTypes();
 
     /**
-     * Validate a file of this type
+     * Validate a file of this questionType
      */
     void validateFile(MultipartFile file);
 
     /**
-     * Process and save a file of this type
+     * Process and save a file of this questionType
      */
     File processAndSaveFile(MultipartFile file) throws IOException;
 }

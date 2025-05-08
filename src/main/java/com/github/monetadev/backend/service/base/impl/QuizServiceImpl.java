@@ -1,5 +1,8 @@
 package com.github.monetadev.backend.service.base.impl;
 
+import com.github.monetadev.backend.graphql.type.ai.quiz.generate.GeneratedOption;
+import com.github.monetadev.backend.graphql.type.ai.quiz.generate.GeneratedQuestion;
+import com.github.monetadev.backend.graphql.type.ai.quiz.generate.GeneratedQuiz;
 import com.github.monetadev.backend.graphql.type.input.quiz.OptionInput;
 import com.github.monetadev.backend.graphql.type.input.quiz.QuestionInput;
 import com.github.monetadev.backend.graphql.type.input.quiz.QuizInput;
@@ -9,15 +12,13 @@ import com.github.monetadev.backend.repository.FlashcardSetRepository;
 import com.github.monetadev.backend.repository.QuizRepository;
 import com.github.monetadev.backend.service.base.QuizService;
 import com.github.monetadev.backend.service.security.AuthenticationService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,12 @@ public class QuizServiceImpl implements QuizService {
         this.quizRepository = quizRepository;
         this.authenticationService = authenticationService;
         this.flashcardSetRepository = flashcardSetRepository;
+    }
+
+    @Override
+    public Quiz findQuizById(UUID id) {
+        return quizRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Quiz not found with ID: " + id));
     }
 
     @Override
@@ -50,17 +57,10 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = new Quiz();
         quiz.setTitle(quizInput.getTitle());
         quiz.setDescription(quizInput.getDescription());
-        quiz.setUser(currentUser);
+        quiz.setAuthor(currentUser);
         quiz.setFlashcardSet(flashcardSet);
 
-        float correctCount = quizInput.getQuestions()
-                .stream()
-                .filter(QuestionInput::isCorrectUserResponse)
-                .count();
-        float grade = quizInput.getQuestions().isEmpty() ? 0 : correctCount / quizInput.getQuestions().size();
-        quiz.setGrade(grade);
-
-        Set<Question> questions = new HashSet<>();
+        List<Question> questions = new LinkedList<>();
         for (QuestionInput questionInput : quizInput.getQuestions()) {
             Question question = convertQuestionInputToQuestion(questionInput, quiz);
             questions.add(question);
@@ -69,14 +69,57 @@ public class QuizServiceImpl implements QuizService {
         return quizRepository.save(quiz);
     }
 
+    @Override
+    @Transactional
+    public Quiz saveGeneratedQuiz(GeneratedQuiz generatedQuiz, UUID flashcardSetId) {
+        User currentUser = authenticationService.getAuthenticatedUser();
+        FlashcardSet flashcardSet = flashcardSetRepository.findById(flashcardSetId)
+                .orElseThrow(() -> new NoSuchElementException("FlashcardSet not found with ID: " + flashcardSetId));
+
+        Quiz quiz = new Quiz();
+        quiz.setTitle(generatedQuiz.getTitle());
+        quiz.setDescription(generatedQuiz.getDescription());
+        quiz.setAuthor(currentUser);
+        quiz.setFlashcardSet(flashcardSet);
+        quiz.setQuestions(new ArrayList<>());
+
+        for (GeneratedQuestion generatedQuestion : generatedQuiz.getQuestions()) {
+            System.out.println("On question " + generatedQuestion.getPosition());
+            Question question = mapQuestionTypes(generatedQuestion, quiz);
+            quiz.getQuestions().add(question);
+        }
+
+        return quizRepository.save(quiz);
+    }
+
+    @NotNull
+    private static Question mapQuestionTypes(GeneratedQuestion generatedQuestion, Quiz quiz) {
+        Question question = new Question();
+        question.setContent(generatedQuestion.getContent());
+        question.setPosition(generatedQuestion.getPosition());
+        question.setQuestionType(generatedQuestion.getQuestionType());
+        question.setQuiz(quiz);
+
+        if (generatedQuestion.getOptions() != null && !generatedQuestion.getOptions().isEmpty()) {
+            List<Option> options = new ArrayList<>();
+            for (GeneratedOption generatedOption : generatedQuestion.getOptions()) {
+                Option option = new Option();
+                option.setContent(generatedOption.getContent());
+                option.setPosition(generatedOption.getPosition());
+                option.setIsCorrect(generatedOption.getIsCorrect());
+                option.setQuestion(question);
+                options.add(option);
+            }
+            question.setOptions(options);
+        }
+        return question;
+    }
+
     private Question convertQuestionInputToQuestion(QuestionInput questionInput, Quiz quiz) {
         Question question = new Question();
         question.setContent(questionInput.getContent());
         question.setPosition(questionInput.getPosition());
-        question.setQuestionType(questionInput.getType());
-        question.setUserResponse(questionInput.getUserResponse());
-        question.setIsCorrectUserResponse(questionInput.isCorrectUserResponse());
-        question.setFeedback(questionInput.getFeedback());
+        question.setQuestionType(questionInput.getQuestionType());
         question.setQuiz(quiz);
 
         if (questionInput.getOptions() != null) {
@@ -112,7 +155,7 @@ public class QuizServiceImpl implements QuizService {
     @Transactional(readOnly = true)
     public PaginatedQuiz getCurrentAuthenticatedUserQuizzes(int page, int size) {
         User authenticatedUser = authenticationService.getAuthenticatedUser();
-        Page<Quiz> quizzes = quizRepository.findByUserId(authenticatedUser.getId(), PageRequest.of(page, size));
+        Page<Quiz> quizzes = quizRepository.findByAuthorId(authenticatedUser.getId(), PageRequest.of(page, size));
 
         return PaginatedQuiz.of()
                 .items(quizzes.getContent())
@@ -138,14 +181,12 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional(readOnly = true)
     public Integer calculateFlashcardSetAverageQuizScore(UUID setId) {
-        Double averageScore = quizRepository.findAverageScoreByFlashcardSetId(setId);
-        return (averageScore == null) ? 0 : averageScore.intValue();
+        return null;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Integer calculateUserAverageQuizScore(UUID userId) {
-        Double averageScore = quizRepository.findAverageScoreByUserId(userId);
-        return (averageScore == null) ? 0 : averageScore.intValue();
+    public Integer calculateUserTotalAverageQuizScore(UUID userId) {
+        return null;
     }
 }

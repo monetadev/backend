@@ -72,7 +72,7 @@ public class ProfilePictureService implements FileTypeService {
         String contentType = file.getContentType();
         if (contentType == null || !getAllowedMimeTypes().contains(contentType)) {
             throw new InvalidFileUploadException(
-                    "Invalid image type. Allowed types: " + String.join(", ", getAllowedMimeTypes())
+                    "Invalid image questionType. Allowed types: " + String.join(", ", getAllowedMimeTypes())
             );
         }
     }

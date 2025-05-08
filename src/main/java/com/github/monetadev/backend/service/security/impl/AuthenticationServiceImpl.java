@@ -155,7 +155,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new UserNotAuthenticatedException("Principal not authenticated. Please login.");
         }
         if (!(authentication.getPrincipal() instanceof JwtUserDetails userDetails)) {
-            throw new UserNotAuthenticatedException("Unexpected principal type");
+            throw new UserNotAuthenticatedException("Unexpected principal questionType");
         }
         return userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new UserNotAuthenticatedException("Principal is authenticated, but user could not be found."));

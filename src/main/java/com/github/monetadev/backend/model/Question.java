@@ -3,12 +3,14 @@ package com.github.monetadev.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = {"id", "responses", "quiz"})
 @Entity
 public class Question {
     @Id
@@ -16,7 +18,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 10000)
     private String content;
 
     @Column(name = "position", nullable = false)
@@ -25,15 +27,6 @@ public class Question {
     @Column(name = "question_type", nullable = false)
     private QuestionType questionType;
 
-    @Column(name = "user_response", nullable = false)
-    private String userResponse;
-
-    @Column(name = "is_correct_user_response", nullable = false)
-    private Boolean isCorrectUserResponse;
-
-    @Column(name = "feedback", nullable = false)
-    private String feedback;
-
     @OneToMany(
             mappedBy = "question",
             fetch = FetchType.EAGER,
@@ -41,6 +34,13 @@ public class Question {
             orphanRemoval = true
     )
     private List<Option> options;
+
+    @OneToMany(
+            mappedBy = "question",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
+    private List<QuizAttemptUserQuestionResponse> responses;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)

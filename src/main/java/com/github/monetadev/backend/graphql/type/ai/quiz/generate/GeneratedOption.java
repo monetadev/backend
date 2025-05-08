@@ -6,4 +6,5 @@ import lombok.Data;
 public class GeneratedOption {
     String content;
     Integer position;
+    Boolean isCorrect;
 }

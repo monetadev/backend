@@ -3,14 +3,16 @@ package com.github.monetadev.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = {"id", "author", "flashcardSet"})
 @Entity
 public class Quiz {
     @Id
@@ -21,15 +23,12 @@ public class Quiz {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 10000)
     private String description;
 
-    @Column(name = "grade", nullable = false)
-    private Float grade;
-
     @ManyToOne
-    @JoinColumn(name = "quiz_user_id", nullable = false, updatable = false)
-    private User user;
+    @JoinColumn(name = "author_id", nullable = false, updatable = false)
+    private User author;
 
     @ManyToOne
     @JoinColumn(name = "flashcard_set_id", nullable = false, updatable = false)
@@ -45,5 +44,5 @@ public class Quiz {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<Question> questions;
+    private List<Question> questions;
 }
