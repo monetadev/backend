@@ -3,11 +3,13 @@ package com.github.monetadev.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = {"id", "flashcardSet"})
 @Entity
 public class Flashcard {
     @Id
@@ -18,10 +20,10 @@ public class Flashcard {
     @Column(name = "position", nullable = false)
     private Integer position;
 
-    @Column(name = "term", nullable = false)
+    @Column(name = "term", nullable = false, length = 10000)
     private String term;
 
-    @Column(name = "definition", nullable = false)
+    @Column(name = "definition", nullable = false, length = 10000)
     private String definition;
 
     @ManyToOne(fetch = FetchType.LAZY)

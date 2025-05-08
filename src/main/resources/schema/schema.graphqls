@@ -17,12 +17,20 @@ enum GenerationType {
     VERBOSE
 }
 
-"""Used to specify a question's type in a quiz, value changes data structure of resultant question/options"""
+"""Used to specify a question's questionType in a quiz, value changes data structure of resultant question/options"""
 enum QuestionType {
     MULTIPLE_CHOICE_SINGLE_ANSWER,
     MULTIPLE_CHOICE_MULTIPLE_ANSWER,
     TRUE_FALSE,
     SHORT_ANSWER
+}
+
+"""Used to specify the difficulty of a quiz, value changes generated data's difficulty conditional to the topic."""
+enum QuizDifficulty {
+    BEGINNER
+    INTERMEDIATE
+    ADVANCED
+    EXPERT
 }
 
 # Common and Pagination Types
@@ -78,6 +86,15 @@ type PaginatedUserLogin {
 type PaginatedQuiz {
     """Quiz items on the current page"""
     items: [Quiz!]!
+
+    """Pagination metadata"""
+    pageInfo: PageInfo!
+}
+
+"""Paginated collection of QuizAttempt objects"""
+type PaginatedQuizAttempt {
+    """Quiz items on the current page"""
+    items: [QuizAttempt!]!
 
     """Pagination metadata"""
     pageInfo: PageInfo!
@@ -216,9 +233,7 @@ type Quiz {
 
     description: String
 
-    grade: Float!
-
-    user: User!
+    author: User!
 
     flashcardSet: FlashcardSet!
 
@@ -234,13 +249,7 @@ type Question {
 
     position: Int!
 
-    type: QuestionType!
-
-    userResponse: String!
-
-    isCorrectUserResponse: Boolean!
-
-    feedback: String!
+    questionType: QuestionType!
 
     options: [Option]
 
@@ -257,6 +266,37 @@ type Option {
     isCorrect: Boolean!
 
     questionId: UUID!
+}
+
+"""User attempts on quizzes"""
+type QuizAttempt {
+    """Unique identifier for the quiz attempt"""
+    id: UUID!
+
+    attemptDate: DateTime
+
+    score: Int!
+
+    quiz: Quiz!
+
+    user: User!
+
+    responses: [QuizAttemptUserQuestionResponse!]!
+}
+
+type QuizAttemptUserQuestionResponse {
+    """Unique identifier for the quiz attempt's question response"""
+    id: UUID!
+
+    response: String
+
+    isCorrect: Boolean!
+
+    feedback: String
+
+    attempt: QuizAttempt!
+
+    question: Question!
 }
 
 """Collection of related flashcards created by a user"""
@@ -343,7 +383,7 @@ type GeneratedQuestion {
     position: Int
 
     """Current question's type, dictates if `options` is null"""
-    type: QuestionType
+    questionType: QuestionType
 
     """Options for the question, dependant on certain QuestionType values"""
     options: [GeneratedOption]
@@ -356,6 +396,9 @@ type GeneratedOption {
 
     """Relative location of the option in the question"""
     position: Int
+
+    """Indicates whether the generated option is a/the correct response."""
+    isCorrect: Boolean
 }
 
 """Quiz graded through AI processing"""
@@ -448,7 +491,7 @@ input FlashcardSetInput {
     flashcards: [FlashcardInput]!
 }
 
-"""Input for creating or updating a quiz"""
+"""Input for creating"""
 input QuizInput {
     """Title of the quiz"""
     title: String
@@ -463,24 +506,25 @@ input QuizInput {
     setId: UUID
 }
 
-"""Input for creating questions to associate with a QuizInput"""
+"""Input for quiz attempts."""
+input QuizAttemptInput {
+    """ID of the quiz which the attempt is for"""
+    quizId: UUID!
+
+    """List of user's response to quiz's questions"""
+    responses: [QuestionInput!]!
+}
+
+"""Input for questions in a quiz attempt."""
 input QuestionInput {
-    """Content of the question"""
+    """Position of the question."""
+    position: Int!
+
+    """User's response to the question. Has a required format dependant on the QuestionType"""
     content: String
 
-    """Position relative to other questions. 1, or lowest value, is assumed first"""
-    position: Int
+    questionType: QuestionType
 
-    """Enum representing the type of question"""
-    type: QuestionType
-
-    userResponse: String
-
-    isCorrectUserResponse: String
-
-    feedback: String
-
-    """(Optional. Dependant on the QuestionType) Options for the question"""
     options: [OptionInput]
 }
 
@@ -655,6 +699,39 @@ type Query {
     """Returns the current authenticated user's login streak (consecutive 24-hour periods with at least one login)"""
     myLoginStreak: Int!
 
+    getQuizAttempt(
+        attemptId: UUID!
+    ): QuizAttempt!
+
+    findQuizById(
+        id: UUID!
+    ): Quiz
+
+    getUserQuizAttempts(
+        userId: UUID
+
+        page: Int = 0
+
+        size: Int = 10
+    ): PaginatedQuizAttempt!
+
+    getQuizAttemptsByQuizId(
+        quizId: UUID
+
+        page: Int = 0
+
+        size: Int = 10
+    ): PaginatedQuizAttempt!
+
+    getUserQuizAttemptsByQuizId(
+        userId: UUID
+
+        quizId: UUID
+
+        page: Int = 0
+
+        size: Int = 10
+    ): PaginatedQuizAttempt!
 }
 
 type Mutation {
@@ -732,11 +809,11 @@ type Mutation {
     generateQuiz(
         """Configuration options for quiz generation"""
         options: QuizGenOptions!
-    ): GeneratedQuiz!
+    ): Quiz!
 
     gradeQuiz(
-        quiz: QuizInput!
-    ): GradedQuiz!
+        quiz: QuizAttemptInput!
+    ): QuizAttempt!
 
     persistQuiz(
         gradedQuiz: QuizInput!
@@ -746,6 +823,10 @@ type Mutation {
         userId: UUID!
 
         quizId: UUID!
+    ): String!
+
+    deleteQuizAttempt(
+        attemptId: UUID!
     ): String!
 
     # Role Mutations

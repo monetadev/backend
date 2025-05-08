@@ -87,10 +87,10 @@ public class FlashcardSetGenerationServiceImpl implements FlashcardSetGeneration
     public FlashcardSetGenerationServiceImpl(ChatClient.Builder chatClientBuilder,
                                              PgVectorStore vectorStore,
                                              AuthenticationService authenticationService,
-                                             @Value("classpath:ai/gen/set/vector/system.st") Resource vectorSystemPrompt,
-                                             @Value("classpath:ai/gen/set/vector/rewrite.st") Resource vectorRewritePrompt,
-                                             @Value("classpath:ai/gen/set/document/rewrite.st") Resource documentRewritePrompt,
-                                             @Value("classpath:ai/gen/set/document/system.st") Resource documentSystemPrompt, @Qualifier("openAiChatModel") ChatModel chatModel) {
+                                             @Value("classpath:ai/set/vector/system.st") Resource vectorSystemPrompt,
+                                             @Value("classpath:ai/set/vector/rewrite.st") Resource vectorRewritePrompt,
+                                             @Value("classpath:ai/set/document/rewrite.st") Resource documentRewritePrompt,
+                                             @Value("classpath:ai/set/document/system.st") Resource documentSystemPrompt, @Qualifier("openAiChatModel") ChatModel chatModel) {
         this.chatClientBuilder = chatClientBuilder;
         this.vectorStore = vectorStore;
         this.authenticationService = authenticationService;

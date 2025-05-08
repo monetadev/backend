@@ -4,28 +4,31 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
 
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"id", "question"})
+@ToString(exclude = {"id", "quizAttempt"})
 @Entity
-public class Option {
+public class QuizAttemptUserQuestionResponse {
     @Id
-    @Column(name = "option_id")
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "quiz_attempt_user_question_response_id")
     private UUID id;
 
-    @Column(name = "content", nullable = false)
-    private String content;
-
-    @Column(name = "position", nullable = false)
-    private Integer position;
+    @Column(name = "response", nullable = false, length = 10000)
+    private String response;
 
     @Column(name = "is_correct", nullable = false)
     private Boolean isCorrect;
+
+    @Column(name = "feedback", length = 10000)
+    private String feedback;
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_attempt_id", nullable = false)
+    private QuizAttempt quizAttempt;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)

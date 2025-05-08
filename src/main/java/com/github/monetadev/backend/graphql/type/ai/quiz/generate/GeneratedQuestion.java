@@ -10,6 +10,7 @@ import java.util.List;
 public class GeneratedQuestion {
     String content;
     Integer position;
-    Question.QuestionType type;
+    String answer;
+    Question.QuestionType questionType;
     List<GeneratedOption> options;
 }

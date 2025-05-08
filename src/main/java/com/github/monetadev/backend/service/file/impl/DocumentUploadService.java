@@ -66,7 +66,7 @@ public class DocumentUploadService implements FileTypeService {
         String contentType = file.getContentType();
         if (contentType == null || !getAllowedMimeTypes().contains(contentType)) {
             throw new InvalidFileUploadException(
-                    "Invalid document type. Allowed types: " + String.join(", ", getAllowedMimeTypes())
+                    "Invalid document questionType. Allowed types: " + String.join(", ", getAllowedMimeTypes())
             );
         }
     }

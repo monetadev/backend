@@ -3,6 +3,7 @@ package com.github.monetadev.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = {"id", "isPublic", "author"})
 @Entity
 public class FlashcardSet {
     @Id
@@ -22,7 +24,7 @@ public class FlashcardSet {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length = 10000)
     private String description;
 
     @Column(name = "is_public", nullable = false)

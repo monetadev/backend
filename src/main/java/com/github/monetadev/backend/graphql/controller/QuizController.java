@@ -1,18 +1,17 @@
 package com.github.monetadev.backend.graphql.controller;
 
-import com.github.monetadev.backend.graphql.type.ai.quiz.generate.GeneratedQuiz;
-import com.github.monetadev.backend.graphql.type.ai.quiz.grade.GradedQuiz;
+import com.github.monetadev.backend.graphql.type.input.quiz.QuizAttemptInput;
 import com.github.monetadev.backend.graphql.type.input.quiz.QuizGenOptions;
 import com.github.monetadev.backend.graphql.type.input.quiz.QuizInput;
 import com.github.monetadev.backend.graphql.type.pagination.PaginatedQuiz;
 import com.github.monetadev.backend.model.Quiz;
+import com.github.monetadev.backend.model.QuizAttempt;
 import com.github.monetadev.backend.service.ai.QuizGenerationService;
 import com.github.monetadev.backend.service.base.QuizService;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.UUID;
 
@@ -26,13 +25,19 @@ public class QuizController {
         this.quizGenerationService = quizGenerationService;
     }
 
+    @DgsQuery
+    public Quiz findQuizById(@InputArgument UUID id) {
+        return quizService.findQuizById(id);
+    }
+
     @DgsMutation
-    public GeneratedQuiz generateQuiz(@InputArgument QuizGenOptions options) {
+    public Quiz generateQuiz(@InputArgument QuizGenOptions options) {
         return quizGenerationService.generateQuiz(options);
     }
 
     @DgsMutation
-    public GradedQuiz gradeQuiz(@InputArgument QuizInput quiz) {
+    public QuizAttempt gradeQuiz(@InputArgument QuizAttemptInput quiz) {
+        System.out.println(quiz.toString());
         return quizGenerationService.gradeQuizFromInput(quiz);
     }
 
@@ -42,7 +47,7 @@ public class QuizController {
     }
 
     @DgsMutation
-    @PreAuthorize("hasAuthority('MANAGE_USER') or authentication.principal.userId == #userId")
+    //@PreAuthorize("hasAuthority('MANAGE_USER') or authentication.principal.userId == #userId")
     public String deleteQuiz(@InputArgument UUID userId, @InputArgument UUID quizId) {
         return quizService.deleteQuiz(quizId);
     }
@@ -66,6 +71,6 @@ public class QuizController {
 
     @DgsQuery
     public Integer calculateUserAverageGrade(@InputArgument UUID userId) {
-        return quizService.calculateUserAverageQuizScore(userId);
+        return quizService.calculateUserTotalAverageQuizScore(userId);
     }
 }

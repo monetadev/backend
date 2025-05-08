@@ -1,0 +1,84 @@
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The title of the graded quiz."
+    },
+    "description": {
+      "type": "string",
+      "description": "A description of the graded quiz."
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The content or text of the question."
+          },
+          "position": {
+            "type": "integer",
+            "description": "The position of the question in the quiz."
+          },
+          "userResponse": {
+            "type": "string",
+            "description": "The response provided by the user."
+          },
+          "isCorrectAnswer": {
+            "type": "boolean",
+            "description": "Indicates if the user's response was correct."
+          },
+          "feedback": {
+            "type": "string",
+            "description": "Feedback provided for the user's answer."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "The content or text of the option."
+                },
+                "position": {
+                  "type": "integer",
+                  "description": "The position of the option."
+                },
+                "isCorrect": {
+                  "type": "boolean",
+                  "description": "Indicates if this option is a correct answer."
+                }
+              },
+              "required": [
+                "content",
+                "position",
+                "isCorrect"
+              ],
+              "additionalProperties": false
+            },
+            "description": "A list of options for the question, if applicable."
+          }
+        },
+        "required": [
+          "content",
+          "position",
+          "userResponse",
+          "isCorrectAnswer",
+          "feedback",
+          "options"
+        ],
+        "additionalProperties": false
+      },
+      "description": "A list of graded questions in the quiz."
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "questions"
+  ],
+  "additionalProperties": false
+}
